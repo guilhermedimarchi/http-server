@@ -25,7 +25,25 @@ public class Response {
     }
 
     public void send(OutputStream output) throws IOException {
+        writeStatusLine(output);
+        writeHeaders(output);
+        writeBody(output);
+        output.flush();
+        output.close();
+    }
+
+    private void writeStatusLine(OutputStream output) throws IOException {
         output.write(("HTTP/1.1 " + status.value() + " " + status.description() + "\r\n").getBytes());
+    }
+
+    private void writeBody(OutputStream output) throws IOException {
+        if(body != null) {
+            output.write("\r\n".getBytes());
+            output.write(this.body);
+        }
+    }
+
+    private void writeHeaders(OutputStream output) throws IOException {
         if(headers != null) {
             for(String header : headers.keySet()) {
                 String line = header + ": " + headers.get(header);
@@ -33,12 +51,6 @@ public class Response {
                 output.write("\r\n".getBytes());
             }
         }
-        if(body != null) {
-            output.write("\r\n".getBytes());
-            output.write(this.body);
-        }
-        output.flush();
-        output.close();
     }
 
 }
