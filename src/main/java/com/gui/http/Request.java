@@ -27,6 +27,7 @@ public class Request {
             throw new RequestParseException("could not parse request", e);
         }
     }
+
     public String getMethod() {
         return method;
     }
