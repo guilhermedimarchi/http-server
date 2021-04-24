@@ -22,4 +22,11 @@ public class ResponseTest {
         assertEquals("HTTP/1.1 404 Not Found\r\n", output.toString());
     }
 
+    @Test
+    public void whenBodyIsGiven_shouldContainBodyToOutputStream() throws IOException {
+        String body =  "<html>cool page</html>";
+        new Response(OK, body.getBytes()).send(output);
+        assertEquals("HTTP/1.1 200 Ok\r\n\r\n" + body, output.toString());
+    }
+
 }
