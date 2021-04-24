@@ -8,16 +8,16 @@ import java.util.Map;
 
 import static com.gui.http.HttpStatus.*;
 
-public class StaticHandler {
+public class StaticHandler implements HttpHandler {
 
-    private String rootPath;
+    private final String rootPath;
 
     public StaticHandler(String rootPath) {
         this.rootPath = rootPath;
     }
 
+    @Override
     public Response handle(Request request) throws IOException {
-
         if(methodNotImplemented(request))
             return new Response(NOT_IMPLEMENTED);
 
@@ -35,7 +35,6 @@ public class StaticHandler {
             return new Response(OK, null, headers);
         else
             return new Response(OK, body, headers);
-
     }
 
     private boolean methodNotImplemented(Request request) {
