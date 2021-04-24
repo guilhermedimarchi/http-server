@@ -2,13 +2,15 @@ package com.gui.http;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.gui.http.HttpStatus.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.gui.http.HttpStatus.NOT_FOUND;
+import static com.gui.http.HttpStatus.OK;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ResponseTest {
 

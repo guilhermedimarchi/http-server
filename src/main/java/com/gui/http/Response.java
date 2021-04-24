@@ -2,7 +2,9 @@ package com.gui.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 public class Response {
 
@@ -53,4 +55,18 @@ public class Response {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Response response = (Response) o;
+        return status == response.status && Arrays.equals(body, response.body) && Objects.equals(headers, response.headers);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(status, headers);
+        result = 31 * result + Arrays.hashCode(body);
+        return result;
+    }
 }
