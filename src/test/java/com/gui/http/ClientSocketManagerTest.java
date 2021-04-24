@@ -66,7 +66,7 @@ public class ClientSocketManagerTest {
 
         manager.handleClientConnection();
 
-        assertEquals("HTTP/1.1 400 Bad Request\r\n", output.toString());
+        assertEquals("HTTP/1.1 400 Bad Request\r\n\r\nmissing http method or path", output.toString());
         assertLogContains("bad request");
         verify(handler, times(0)).handle(any());
     }

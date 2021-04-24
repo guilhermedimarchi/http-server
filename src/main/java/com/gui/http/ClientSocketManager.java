@@ -26,7 +26,7 @@ public class ClientSocketManager {
             response = handler.handle(request);
         } catch (RequestParseException e) {
             LOGGER.error("bad request", e);
-            response = new Response(BAD_REQUEST);
+            response = new Response(BAD_REQUEST, e.getMessage().getBytes());
         } catch (Exception e) {
             LOGGER.error("internal server error", e);
             response = new Response(INTERNAL_SERVER_ERROR);
