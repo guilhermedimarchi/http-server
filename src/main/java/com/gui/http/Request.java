@@ -13,14 +13,15 @@ public class Request {
     public Request(InputStream input) throws RequestParseException {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(input));
+
             String request = in.readLine();
-            if(request == null || request.isBlank()) {
+            if(request == null || request.isBlank())
                 throw new RequestParseException("request cannot be null or blank");
-            }
+
             String[] members = request.split(" ");
-            if(members.length < 2) {
+            if(members.length < 2)
                 throw new RequestParseException("missing http method or path");
-            }
+
             method = members[0];
             path = members[1];
         } catch (IOException e) {

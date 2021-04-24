@@ -18,9 +18,8 @@ public class StaticHandler {
 
     public Response handle(Request request) throws IOException {
 
-        if(methodNotImplemented(request)) {
+        if(methodNotImplemented(request))
             return new Response(NOT_IMPLEMENTED);
-        }
 
         File file = new File(rootPath + request.getPath());
         if(!file.exists() || file.isDirectory())
@@ -32,11 +31,11 @@ public class StaticHandler {
                 "Content-Length", "" + body.length
         );
 
-        if("HEAD".equals(request.getMethod())) {
+        if("HEAD".equals(request.getMethod()))
             return new Response(OK, null, headers);
-        } else {
+        else
             return new Response(OK, body, headers);
-        }
+
     }
 
     private boolean methodNotImplemented(Request request) {
