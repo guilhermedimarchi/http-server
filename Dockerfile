@@ -1,10 +1,12 @@
-FROM maven
+FROM maven:3.6.0-jdk-11-slim AS build
 
 WORKDIR /app
-
 COPY pom.xml .
-RUN mvn clean install
+RUN mvn dependency:go-offline -B
+COPY src .
+RUN mvn package
 
-COPY . .
-
-CMD ["java", "-cp", "./target/http-server-1.0-SNAPSHOT.jar", "com.gui.App"]
+FROM openjdk:11-jre-slim
+COPY --from=build /app/target .
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","http-server-1.0-SNAPSHOT.jar"]
