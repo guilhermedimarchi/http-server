@@ -1,5 +1,6 @@
 package com.gui.http;
 
+import com.gui.http.handlers.HttpHandler;
 import com.gui.http.handlers.StaticHandler;
 import org.apache.log4j.Logger;
 
@@ -11,14 +12,14 @@ public class HttpServer {
 
     private static final Logger LOGGER = Logger.getLogger(HttpServer.class);
     private final int port;
-    private String rootPath = "./";
+    private HttpHandler handler = new StaticHandler("./");
 
     public HttpServer(int port) throws IOException {
         this.port = port;
     }
 
-    public void setRootPath(String rootPath) {
-        this.rootPath = rootPath;
+    public void setDefaultHandler(HttpHandler handler) {
+        this.handler = handler;
     }
 
     public void start() throws IOException {
@@ -28,7 +29,7 @@ public class HttpServer {
             Socket clientSocket;
             while ((clientSocket = serverSocket.accept()) != null) {
                 LOGGER.info("New connection: " + clientSocket.toString());
-                ClientSocketManager manager = new ClientSocketManager(clientSocket, new StaticHandler(rootPath));
+                ClientSocketManager manager = new ClientSocketManager(clientSocket, handler);
                 Thread t = new Thread(manager);
                 t.start();
             }
