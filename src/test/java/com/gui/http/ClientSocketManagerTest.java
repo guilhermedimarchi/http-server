@@ -3,6 +3,8 @@ package com.gui.http;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,14 +30,23 @@ public class ClientSocketManagerTest {
 
     @Mock private Socket socket;
     @Mock private HttpHandler handler;
+
     private ByteArrayOutputStream output;
     private ClientSocketManager manager;
+    private TestAppender appender;
 
     @BeforeEach
-    public void setup() throws IOException {
+    public void beforeEach() throws IOException {
         output = new ByteArrayOutputStream();
         when(socket.getOutputStream()).thenReturn(output);
+        appender = new TestAppender();
         manager = new ClientSocketManager(socket, handler);
+        Logger.getLogger(ClientSocketManager.class).addAppender(appender);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        appender.clean();
     }
 
     @Test
@@ -56,6 +67,7 @@ public class ClientSocketManagerTest {
         manager.handleClientConnection();
 
         assertEquals("HTTP/1.1 400 Bad Request\r\n", output.toString());
+        assertLogContains("bad request");
         verify(handler, times(0)).handle(any());
     }
 
@@ -69,6 +81,7 @@ public class ClientSocketManagerTest {
         manager.handleClientConnection();
 
         assertEquals("HTTP/1.1 500 Internal Server Error\r\n", output.toString());
+        assertLogContains("internal server error");
         verify(handler, times(1)).handle(any());
     }
 
@@ -78,19 +91,19 @@ public class ClientSocketManagerTest {
         when(handler.handle(any())).thenReturn(new Response(OK));
         when(socket.getOutputStream()).thenThrow(new IOException("some error"));
 
-        final TestAppender appender = new TestAppender();
-        final Logger logger = Logger.getLogger(ClientSocketManager.class);
-        logger.addAppender(appender);
-
         manager.handleClientConnection();
 
-        assertFalse(appender.log.isEmpty());
-        assertEquals("error writing response to socket output", appender.log.get(0).getMessage());
+        assertLogContains("error writing response to socket output");
     }
 
     private void givenInput(String in) throws Exception {
         InputStream input = new ByteArrayInputStream(in.getBytes());
         when(socket.getInputStream()).thenReturn(input);
+    }
+
+    private void assertLogContains(String message) {
+        assertFalse(appender.log.isEmpty());
+        assertEquals(message, appender.log.get(0).getMessage());
     }
 
     private class TestAppender extends AppenderSkeleton {

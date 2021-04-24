@@ -10,7 +10,7 @@ import static com.gui.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class ClientSocketManager {
 
-    static final Logger LOGGER = Logger.getLogger(ClientSocketManager.class);
+    private static final Logger LOGGER = Logger.getLogger(ClientSocketManager.class);
     private final Socket socket;
     private final HttpHandler handler;
 
@@ -25,9 +25,10 @@ public class ClientSocketManager {
             Request request = new Request(socket.getInputStream());
             response = handler.handle(request);
         } catch (RequestParseException e) {
+            LOGGER.error("bad request", e);
             response = new Response(BAD_REQUEST);
         } catch (Exception e) {
-            LOGGER.error("Internal server error", e);
+            LOGGER.error("internal server error", e);
             response = new Response(INTERNAL_SERVER_ERROR);
         }
 
