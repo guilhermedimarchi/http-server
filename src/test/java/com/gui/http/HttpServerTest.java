@@ -20,7 +20,7 @@ public class HttpServerTest {
     }
 
     @Test
-    public void shouldListenToPort() {
+    public void shouldListenToPortAndAcceptConnections() {
         Thread thread = new Thread(() -> {
             try {
                 HttpServer server = new HttpServer(8081);
