@@ -10,19 +10,29 @@ public class RequestTest {
 
     @Test
     public void whenFormatIsValid_shouldParseRequest() throws RequestParseException {
-        InputStream input = new ByteArrayInputStream("GET /image1.png HTTP/1.1".getBytes());
-        Request r = new Request(input);
+        Request r = createRequest("GET /image1.png HTTP/1.1");
         assertEquals("GET", r.getMethod());
         assertEquals("/image1.png", r.getPath());
     }
 
     @Test
-    public void whenFormatIsNotValid_shouldThrowRequestParseExceptionException() {
-        InputStream input = new ByteArrayInputStream("".getBytes());
+    public void whenRequestIsBlank_shouldThrowRequestParseException() {
         RequestParseException ex = assertThrows(RequestParseException.class, () -> {
-            Request r = new Request(input);
+            createRequest("");
         });
-        assertEquals("inputStream cannot be null or blank", ex.getMessage());
+        assertEquals("request cannot be null or blank", ex.getMessage());
+    }
+
+    @Test
+    public void whenFormatIsNotValid_shouldThrowRequestParseException() {
+        RequestParseException ex = assertThrows(RequestParseException.class, () -> {
+            createRequest("wrongformat");
+        });
+        assertEquals("missing http method or path", ex.getMessage());
+    }
+
+    private Request createRequest(String content) throws RequestParseException {
+        return new Request(new ByteArrayInputStream(content.getBytes()));
     }
 
 }
