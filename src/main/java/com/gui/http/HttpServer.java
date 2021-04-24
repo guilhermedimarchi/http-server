@@ -23,7 +23,7 @@ public class HttpServer {
     }
 
     public void start() throws IOException {
-        try(ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
             LOGGER.info("Started server");
             LOGGER.info("Listening to port: " + port);
             Socket clientSocket;

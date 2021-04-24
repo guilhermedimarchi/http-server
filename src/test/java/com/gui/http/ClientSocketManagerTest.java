@@ -29,8 +29,10 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class ClientSocketManagerTest {
 
-    @Mock private Socket socket;
-    @Mock private HttpHandler handler;
+    @Mock
+    private Socket socket;
+    @Mock
+    private HttpHandler handler;
 
     private ByteArrayOutputStream output;
     private ClientSocketManager manager;
@@ -77,7 +79,7 @@ public class ClientSocketManagerTest {
     @Test
     public void whenHandlerThrowsException_shouldReturn500() throws Exception {
         givenInput("HEAD / HTTP/1.1");
-        when(handler.handle(any())).thenAnswer( invocation -> {
+        when(handler.handle(any())).thenAnswer(invocation -> {
             throw new IOException("some error while reading content");
         });
 
@@ -113,16 +115,21 @@ public class ClientSocketManagerTest {
 
     private class TestAppender extends AppenderSkeleton {
         private List<LoggingEvent> log = new ArrayList<>();
+
         @Override
         public boolean requiresLayout() {
             return false;
         }
+
         @Override
         protected void append(final LoggingEvent loggingEvent) {
             this.log.add(loggingEvent);
         }
+
         @Override
-        public void close() {}
+        public void close() {
+        }
+
         public void clean() {
             this.log = new ArrayList<>();
         }

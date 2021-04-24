@@ -18,15 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StaticHandlerTest {
 
-    private StaticHandler handler;
     private static final String rootPath = new File("./src/test/resources").getAbsolutePath();
     private static byte[] body;
     private static Map<String, String> headers;
-
-    @BeforeEach
-    public void setup()  {
-        handler = new StaticHandler(rootPath);
-    }
+    private StaticHandler handler;
 
     @BeforeAll
     public static void beforeAll() throws Exception {
@@ -37,14 +32,19 @@ public class StaticHandlerTest {
         );
     }
 
+    @BeforeEach
+    public void setup() {
+        handler = new StaticHandler(rootPath);
+    }
+
     @Test
-    public void whenRequestMethodNotSupported_shouldRespondNotImplemented() throws Exception  {
+    public void whenRequestMethodNotSupported_shouldRespondNotImplemented() throws Exception {
         Response actualResponse = handler.handle(request("PUT / HTTP/1.1"));
         assertEquals(new Response(NOT_IMPLEMENTED), actualResponse);
     }
 
     @Test
-    public void whenFileDoesNotExists_shouldRespondNotFound() throws Exception  {
+    public void whenFileDoesNotExists_shouldRespondNotFound() throws Exception {
         Response actualResponse = handler.handle(request("GET /non-existent-file.txt HTTP/1.1"));
         assertEquals(new Response(NOT_FOUND), actualResponse);
     }

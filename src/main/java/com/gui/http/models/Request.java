@@ -20,11 +20,11 @@ public class Request {
             String request = in.readLine();
             LOGGER.debug("Request received: " + request);
 
-            if(request == null || request.isBlank())
+            if (request == null || request.isBlank())
                 throw new RequestParseException("request cannot be null or blank");
 
             String[] members = request.split(" ");
-            if(members.length < 2)
+            if (members.length < 2)
                 throw new RequestParseException("missing http method or path");
 
             method = members[0];

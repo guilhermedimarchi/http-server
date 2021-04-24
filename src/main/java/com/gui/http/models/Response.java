@@ -12,7 +12,7 @@ public class Response {
 
     private final HttpStatus status;
     private byte[] body;
-    private Map<String,String> headers;
+    private Map<String, String> headers;
 
     public Response(HttpStatus status) {
         this.status = status;
@@ -41,15 +41,15 @@ public class Response {
     }
 
     private void writeBody(OutputStream output) throws IOException {
-        if(body != null) {
+        if (body != null) {
             output.write("\r\n".getBytes());
             output.write(this.body);
         }
     }
 
     private void writeHeaders(OutputStream output) throws IOException {
-        if(headers != null) {
-            for(String header : headers.keySet()) {
+        if (headers != null) {
+            for (String header : headers.keySet()) {
                 String line = header + ": " + headers.get(header);
                 output.write(line.getBytes());
                 output.write("\r\n".getBytes());

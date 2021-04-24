@@ -6,5 +6,5 @@ import com.gui.http.models.Response;
 import java.io.IOException;
 
 public interface HttpHandler {
-    Response handle (Request request) throws IOException;
+    Response handle(Request request) throws IOException;
 }

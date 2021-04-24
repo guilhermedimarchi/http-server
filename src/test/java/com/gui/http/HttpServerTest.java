@@ -51,7 +51,7 @@ public class HttpServerTest {
     }
 
     private void assertClientCanConnectToPort(int port) {
-        try(Socket someClient = new Socket("localhost", port)) {
+        try (Socket someClient = new Socket("localhost", port)) {
             assertTrue(someClient.isConnected());
             DataOutputStream out = new DataOutputStream(someClient.getOutputStream());
             out.write("GET / HTTP/1.1".getBytes());

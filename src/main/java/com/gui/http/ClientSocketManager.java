@@ -18,7 +18,7 @@ public class ClientSocketManager implements Runnable {
     private final Socket socket;
     private final HttpHandler handler;
 
-    public ClientSocketManager(Socket socket, HttpHandler handler)  {
+    public ClientSocketManager(Socket socket, HttpHandler handler) {
         this.socket = socket;
         this.handler = handler;
     }
