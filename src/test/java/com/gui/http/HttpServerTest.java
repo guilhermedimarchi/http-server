@@ -10,13 +10,17 @@ import static org.junit.jupiter.api.Assertions.*;
 public class HttpServerTest {
 
     @Test
-    public void whenPortIsNotGiven_shouldCreateServerUsingDefault8080Port() throws IOException {
-        HttpServer server = new HttpServer();
-        assertNotNull(server);
-        assertThrows(IOException.class, () -> {
-             new HttpServer(8080);
+    public void whenPortIsNotGiven_shouldCreateServerUsingDefault8080Port() {
+        Thread thread = new Thread(() -> {
+            try {
+                HttpServer server = new HttpServer();
+                server.start();
+            } catch (IOException e) {
+                fail("could not start server");
+            }
         });
-        server.close();
+        thread.start();
+        assertClientCanConnectOnPort(8080);
     }
 
     @Test
@@ -30,11 +34,11 @@ public class HttpServerTest {
             }
         });
         thread.start();
-        assertClientCanConnect();
+        assertClientCanConnectOnPort(8081);
     }
 
-    private void assertClientCanConnect() {
-        try(Socket someClient = new Socket("localhost", 8081)) {
+    private void assertClientCanConnectOnPort(int port) {
+        try(Socket someClient = new Socket("localhost", port)) {
             assertTrue(someClient.isConnected());
         } catch (Exception e) {
             fail("client socket should be able to connect");

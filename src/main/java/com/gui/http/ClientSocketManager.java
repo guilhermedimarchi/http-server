@@ -12,7 +12,7 @@ import java.net.Socket;
 import static com.gui.http.HttpStatus.BAD_REQUEST;
 import static com.gui.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
-public class ClientSocketManager {
+public class ClientSocketManager implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(ClientSocketManager.class);
     private final Socket socket;
@@ -23,7 +23,8 @@ public class ClientSocketManager {
         this.handler = handler;
     }
 
-    public void handleClientConnection() {
+    @Override
+    public void run() {
         Response response;
         try {
             Request request = new Request(socket.getInputStream());

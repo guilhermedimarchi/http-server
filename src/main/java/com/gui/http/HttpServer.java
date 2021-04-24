@@ -9,27 +9,24 @@ import java.net.Socket;
 
 public class HttpServer {
 
-    private static final int defaultPort = 8080;
-    private final ServerSocket serverSocket;
+    private static int port = 8080;
     private final HttpHandler defaultHandler = new StaticHandler("./");
 
-    public HttpServer() throws IOException {
-        serverSocket = new ServerSocket(defaultPort);
-    }
+    public HttpServer() { }
 
-    public HttpServer(final int port) throws IOException {
-        serverSocket = new ServerSocket(port);
+    public HttpServer(int port) throws IOException {
+        this.port = port;
     }
 
     public void start() throws IOException {
-        Socket clientSocket;
-        while ((clientSocket = serverSocket.accept()) != null)  {
-            ClientSocketManager manager = new ClientSocketManager(clientSocket, defaultHandler);
-            manager.handleClientConnection();
+        try(ServerSocket serverSocket = new ServerSocket(port)) {
+            Socket clientSocket;
+            while ((clientSocket = serverSocket.accept()) != null)  {
+                ClientSocketManager manager = new ClientSocketManager(clientSocket, defaultHandler);
+                Thread t = new Thread(manager);
+                t.start();
+            }
         }
     }
 
-    public void close() throws IOException {
-        this.serverSocket.close();
-    }
 }

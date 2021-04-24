@@ -55,7 +55,7 @@ public class ClientSocketManagerTest {
         givenInput("HEAD / HTTP/1.1");
         when(handler.handle(any())).thenReturn(new Response(OK));
 
-        manager.handleClientConnection();
+        manager.run();
 
         assertEquals("HTTP/1.1 200 Ok\r\n", output.toString());
         verify(handler, times(1)).handle(any());
@@ -65,7 +65,7 @@ public class ClientSocketManagerTest {
     public void whenRequestIsMalFormed_shouldReturn400() throws Exception {
         givenInput("invalidRequest");
 
-        manager.handleClientConnection();
+        manager.run();
 
         assertEquals("HTTP/1.1 400 Bad Request\r\n\r\nmissing http method or path", output.toString());
         assertLogContains("bad request");
@@ -79,7 +79,7 @@ public class ClientSocketManagerTest {
             throw new IOException("some error while reading content");
         });
 
-        manager.handleClientConnection();
+        manager.run();
 
         assertEquals("HTTP/1.1 500 Internal Server Error\r\n", output.toString());
         assertLogContains("internal server error");
@@ -92,7 +92,7 @@ public class ClientSocketManagerTest {
         when(handler.handle(any())).thenReturn(new Response(OK));
         when(socket.getOutputStream()).thenThrow(new IOException("some error"));
 
-        manager.handleClientConnection();
+        manager.run();
 
         assertLogContains("error writing response to socket output");
     }
