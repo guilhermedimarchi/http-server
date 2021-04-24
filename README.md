@@ -3,6 +3,6 @@
 ## How to run
 
 
-```mvn clean package```
+```docker build -t guilhermedimarchi/webserver```
 
-`` java -cp ./target/http-server-1.0-SNAPSHOT.jar com.gui.App``
+```docker run -p 8080:8080 guilhermedimarchi/webserver```
