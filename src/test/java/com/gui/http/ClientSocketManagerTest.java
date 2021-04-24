@@ -59,6 +59,7 @@ public class ClientSocketManagerTest {
 
         assertEquals("HTTP/1.1 200 Ok\r\n", output.toString());
         verify(handler, times(1)).handle(any());
+        verify(socket, times(1)).close();
     }
 
     @Test
@@ -70,6 +71,7 @@ public class ClientSocketManagerTest {
         assertEquals("HTTP/1.1 400 Bad Request\r\n\r\nmissing http method or path", output.toString());
         assertLogContains("bad request");
         verify(handler, times(0)).handle(any());
+        verify(socket, times(1)).close();
     }
 
     @Test
@@ -84,6 +86,7 @@ public class ClientSocketManagerTest {
         assertEquals("HTTP/1.1 500 Internal Server Error\r\n", output.toString());
         assertLogContains("internal server error");
         verify(handler, times(1)).handle(any());
+        verify(socket, times(1)).close();
     }
 
     @Test
@@ -95,6 +98,7 @@ public class ClientSocketManagerTest {
         manager.run();
 
         assertLogContains("error writing response to socket output");
+        verify(socket, times(1)).close();
     }
 
     private void givenInput(String in) throws Exception {

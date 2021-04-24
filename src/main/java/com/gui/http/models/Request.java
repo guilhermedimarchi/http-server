@@ -1,5 +1,6 @@
 package com.gui.http.models;
 
+import org.apache.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +8,7 @@ import java.io.InputStreamReader;
 
 public class Request {
 
+    private static final Logger LOGGER = Logger.getLogger(Request.class);
     private final String method;
     private final String path;
 
@@ -15,6 +17,8 @@ public class Request {
             BufferedReader in = new BufferedReader(new InputStreamReader(input));
 
             String request = in.readLine();
+            LOGGER.debug("Request received: " + request);
+
             if(request == null || request.isBlank())
                 throw new RequestParseException("request cannot be null or blank");
 

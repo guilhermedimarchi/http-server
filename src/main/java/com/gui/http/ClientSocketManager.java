@@ -25,22 +25,28 @@ public class ClientSocketManager implements Runnable {
 
     @Override
     public void run() {
-        Response response;
-        try {
-            Request request = new Request(socket.getInputStream());
-            response = handler.handle(request);
-        } catch (RequestParseException e) {
-            LOGGER.error("bad request", e);
-            response = new Response(BAD_REQUEST, e.getMessage().getBytes());
-        } catch (Exception e) {
-            LOGGER.error("internal server error", e);
-            response = new Response(INTERNAL_SERVER_ERROR);
-        }
 
         try {
+            Response response;
+            try {
+                Request request = new Request(socket.getInputStream());
+                response = handler.handle(request);
+            } catch (RequestParseException e) {
+                LOGGER.error("bad request", e);
+                response = new Response(BAD_REQUEST, e.getMessage().getBytes());
+            } catch (Exception e) {
+                LOGGER.error("internal server error", e);
+                response = new Response(INTERNAL_SERVER_ERROR);
+            }
             response.send(socket.getOutputStream());
         } catch (IOException e) {
             LOGGER.error("error writing response to socket output", e);
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                LOGGER.error("could not close socket", e);
+            }
         }
     }
 
