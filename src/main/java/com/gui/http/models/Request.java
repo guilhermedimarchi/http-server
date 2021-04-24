@@ -1,4 +1,4 @@
-package com.gui.http;
+package com.gui.http.models;
 
 import java.io.BufferedReader;
 import java.io.IOException;

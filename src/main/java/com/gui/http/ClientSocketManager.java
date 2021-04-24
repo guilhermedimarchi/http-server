@@ -1,5 +1,9 @@
 package com.gui.http;
 
+import com.gui.http.handlers.HttpHandler;
+import com.gui.http.models.Request;
+import com.gui.http.models.RequestParseException;
+import com.gui.http.models.Response;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

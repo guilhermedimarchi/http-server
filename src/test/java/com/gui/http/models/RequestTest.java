@@ -1,5 +1,7 @@
-package com.gui.http;
+package com.gui.http.models;
 
+import com.gui.http.models.Request;
+import com.gui.http.models.RequestParseException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

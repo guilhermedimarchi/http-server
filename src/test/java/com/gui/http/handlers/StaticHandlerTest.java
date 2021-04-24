@@ -1,5 +1,7 @@
-package com.gui.http;
+package com.gui.http.handlers;
 
+import com.gui.http.models.Request;
+import com.gui.http.models.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

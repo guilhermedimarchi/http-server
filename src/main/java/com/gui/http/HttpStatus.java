@@ -1,7 +1,6 @@
 package com.gui.http;
 
-
-enum HttpStatus {
+public enum HttpStatus {
     NOT_FOUND(404, "Not Found"),
     OK(200, "Ok"),
     NOT_IMPLEMENTED(501, "Not Implemented"),

@@ -1,5 +1,7 @@
 package com.gui.http;
 
+import com.gui.http.handlers.HttpHandler;
+import com.gui.http.models.Response;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -116,8 +118,7 @@ public class ClientSocketManagerTest {
             this.log.add(loggingEvent);
         }
         @Override
-        public void close() {
-        }
+        public void close() {}
         public void clean() {
             this.log = new ArrayList<>();
         }

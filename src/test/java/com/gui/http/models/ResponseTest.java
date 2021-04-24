@@ -1,4 +1,4 @@
-package com.gui.http;
+package com.gui.http.models;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,6 @@
-package com.gui.http;
+package com.gui;
+
+import com.gui.http.HttpServer;
 
 import java.io.IOException;
 

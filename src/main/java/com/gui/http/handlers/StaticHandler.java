@@ -1,4 +1,7 @@
-package com.gui.http;
+package com.gui.http.handlers;
+
+import com.gui.http.models.Request;
+import com.gui.http.models.Response;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import static com.gui.http.HttpStatus.*;
+
 
 public class StaticHandler implements HttpHandler {
 

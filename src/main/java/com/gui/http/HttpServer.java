@@ -1,5 +1,8 @@
 package com.gui.http;
 
+import com.gui.http.handlers.HttpHandler;
+import com.gui.http.handlers.StaticHandler;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
