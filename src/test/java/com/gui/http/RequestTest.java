@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class RequestTest {
 
     @Test
-    public void whenFormatIsValid_shouldParseRequest() throws RequestParseException {
+    public void whenFormatIsValid_shouldParseRequest() throws Exception {
         Request r = createRequest("GET /image1.png HTTP/1.1");
         assertEquals("GET", r.getMethod());
         assertEquals("/image1.png", r.getPath());
@@ -32,7 +32,7 @@ public class RequestTest {
         assertEquals("missing http method or path", ex.getMessage());
     }
 
-    private Request createRequest(String content) throws RequestParseException {
+    private Request createRequest(String content) throws Exception {
         return new Request(new ByteArrayInputStream(content.getBytes()));
     }
 

@@ -23,6 +23,7 @@ public class ClientSocketManager {
         Response response;
         try {
             Request request = new Request(socket.getInputStream());
+
             response = handler.handle(request);
         } catch (RequestParseException e) {
             LOGGER.error("bad request", e);

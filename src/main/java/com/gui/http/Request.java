@@ -10,7 +10,7 @@ public class Request {
     private final String method;
     private final String path;
 
-    public Request(InputStream input) throws RequestParseException {
+    public Request(InputStream input) throws RequestParseException, IOException {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(input));
 
@@ -25,7 +25,7 @@ public class Request {
             method = members[0];
             path = members[1];
         } catch (IOException e) {
-            throw new RequestParseException("could not parse request", e);
+            throw new IOException("could not parse request", e);
         }
     }
 
