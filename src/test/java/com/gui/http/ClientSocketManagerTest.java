@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 
-import static com.gui.http.HttpStatus.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.gui.http.HttpStatus.OK;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

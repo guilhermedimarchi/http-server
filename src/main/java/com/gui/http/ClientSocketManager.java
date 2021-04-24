@@ -1,14 +1,14 @@
 package com.gui.http;
 
-import java.io.IOException;
 import java.net.Socket;
 
-import static com.gui.http.HttpStatus.*;
+import static com.gui.http.HttpStatus.BAD_REQUEST;
+import static com.gui.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class ClientSocketManager {
 
-    private Socket socket;
-    private HttpHandler handler;
+    private final Socket socket;
+    private final HttpHandler handler;
 
     public ClientSocketManager(Socket socket, HttpHandler handler)  {
         this.socket = socket;

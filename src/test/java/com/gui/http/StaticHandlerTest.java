@@ -3,6 +3,7 @@ package com.gui.http;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
@@ -10,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import static com.gui.http.HttpStatus.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class StaticHandlerTest {

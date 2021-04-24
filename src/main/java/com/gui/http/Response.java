@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class Response {
 
-    private HttpStatus status;
+    private final HttpStatus status;
     private byte[] body;
     private Map<String,String> headers;
 

@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 
 public class Request {
 
-    private String method;
-    private String path;
+    private final String method;
+    private final String path;
 
     public Request(InputStream input) throws RequestParseException {
         try {
