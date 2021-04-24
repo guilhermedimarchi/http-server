@@ -21,15 +21,12 @@ public class HttpServerTest {
 
     @Test
     public void shouldListenToPort() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    HttpServer server = new HttpServer(8081);
-                    server.start();
-                } catch (IOException e) {
-                    fail("could not start server");
-                }
+        Thread thread = new Thread(() -> {
+            try {
+                HttpServer server = new HttpServer(8081);
+                server.start();
+            } catch (IOException e) {
+                fail("could not start server");
             }
         });
         thread.start();
