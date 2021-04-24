@@ -25,7 +25,6 @@ public class ClientSocketManager implements Runnable {
 
     @Override
     public void run() {
-
         try {
             Response response;
             try {
@@ -49,5 +48,4 @@ public class ClientSocketManager implements Runnable {
             }
         }
     }
-
 }

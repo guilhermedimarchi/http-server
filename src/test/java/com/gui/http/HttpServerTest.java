@@ -5,25 +5,12 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.Socket;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class HttpServerTest {
 
-    @Test
-    public void whenPortIsNotGiven_shouldCreateServerUsingDefault8080Port() {
-        Thread thread = new Thread(() -> {
-            try {
-                HttpServer server = new HttpServer();
-                server.start();
-            } catch (IOException e) {
-                fail("could not start server");
-            }
-        });
-        thread.start();
-        assertClientCanConnectOnPort(8080);
-    }
-
-    @Test
+   @Test
     public void shouldListenToPortAndAcceptConnections() {
         Thread thread = new Thread(() -> {
             try {
