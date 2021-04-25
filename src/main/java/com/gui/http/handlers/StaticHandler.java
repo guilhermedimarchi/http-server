@@ -1,6 +1,7 @@
 package com.gui.http.handlers;
 
 import com.gui.http.models.FileExplorerHtml;
+import com.gui.http.models.HttpMethod;
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
 import com.gui.http.util.StringUtil;
@@ -12,8 +13,9 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
-import static com.gui.http.HttpHeader.*;
-import static com.gui.http.HttpStatus.*;
+import static com.gui.http.models.HttpHeader.*;
+import static com.gui.http.models.HttpMethod.*;
+import static com.gui.http.models.HttpStatus.*;
 
 
 public class StaticHandler implements HttpHandler {
@@ -34,10 +36,10 @@ public class StaticHandler implements HttpHandler {
             return new Response(NOT_FOUND);
 
         String etag = getEtag(file);
-        if(request.getHeaders().containsKey(IF_MATCH) && !etag.equals(request.getHeaders().get(IF_MATCH)))
+        if (checkIfMatch(request, etag))
             return new Response(PRECONDITION_FAILED);
 
-        if (etag.equals(request.getHeaders().get(IF_NONE_MATCH)))
+        if (checkIfNoneMatch(request, etag))
             return new Response(NOT_MODIFIED);
 
         byte[] body;
@@ -48,16 +50,27 @@ public class StaticHandler implements HttpHandler {
             body = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
         }
 
-        Map<String, String> headers = Map.of(
+        Map<String, String> headers = getHeaders(file, etag, body);
+        if (HEAD.equals(request.getMethod()))
+            return new Response(OK, null, headers);
+        else
+            return new Response(OK, body, headers);
+    }
+
+    private Map<String, String> getHeaders(File file, String etag, byte[] body) throws IOException {
+        return Map.of(
                 CONTENT_TYPE, getContentType(file),
                 CONTENT_LENGTH, "" + body.length,
                 ETAG, etag
         );
+    }
 
-        if ("HEAD".equals(request.getMethod()))
-            return new Response(OK, null, headers);
-        else
-            return new Response(OK, body, headers);
+    private boolean checkIfNoneMatch(Request request, String etag) {
+        return etag.equals(request.getHeaders().get(IF_NONE_MATCH));
+    }
+
+    private boolean checkIfMatch(Request request, String etag) {
+        return request.getHeaders().containsKey(IF_MATCH) && !etag.equals(request.getHeaders().get(IF_MATCH));
     }
 
     private String getContentType(File file) throws IOException {
@@ -73,7 +86,7 @@ public class StaticHandler implements HttpHandler {
     }
 
     private boolean methodNotImplemented(Request request) {
-        return !"GET".equals(request.getMethod()) && !"HEAD".equals(request.getMethod());
+        return !GET.equals(request.getMethod()) && !HEAD.equals(request.getMethod());
     }
 
 }

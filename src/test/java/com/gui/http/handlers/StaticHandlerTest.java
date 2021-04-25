@@ -13,8 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
-import static com.gui.http.HttpHeader.*;
-import static com.gui.http.HttpStatus.*;
+import static com.gui.http.models.HttpHeader.*;
+import static com.gui.http.models.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -77,47 +77,6 @@ public class StaticHandlerTest {
             assertEquals(new Response(OK, body, headers), actualResponse);
         }
 
-        @Test
-        public void whenEtagNoneMatchesIsSame_shouldRespondNotModified() throws Exception {
-            Response firstResponse = handler.handle(request("GET /index.html HTTP/1.1"));
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            firstResponse.send(output);
-            String etag = getEtag(output.toString());
-
-            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":" + etag));
-            assertEquals(new Response(NOT_MODIFIED), actualResponse);
-        }
-
-        @Test
-        public void whenIfMatchIsDifferentThenEtag_shouldRespondPreconditionFailed() throws Exception {
-            Response firstResponse = handler.handle(request("GET /index.html HTTP/1.1"));
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            firstResponse.send(output);
-            String etag = "randometag";
-
-            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
-            assertEquals(new Response(PRECONDITION_FAILED), actualResponse);
-        }
-
-        @Test
-        public void whenIfMatchIsEqualToEtag_shouldRespondOk() throws Exception {
-            Response firstResponse = handler.handle(request("GET /index.html HTTP/1.1"));
-            ByteArrayOutputStream output = new ByteArrayOutputStream();
-            firstResponse.send(output);
-            String etag = getEtag(output.toString());
-
-            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
-            assertEquals(new Response(OK, body, headers), actualResponse);
-        }
-
-        private String getEtag(String output) {
-            String[] lines = output.split("\n");
-            for (String line : lines) {
-                if (line.contains(ETAG))
-                    return line.split(":")[1].trim();
-            }
-            return "";
-        }
     }
 
     @Nested
@@ -160,6 +119,59 @@ public class StaticHandlerTest {
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");
             assertTrue(response.contains("Index of ." + File.separator + "folder1" + File.separator + "folder2"), "expected to get HTML of ./folder1/folder2");
             assertTrue(response.contains("<a href=\"" + File.separator + "folder1\">../</a>"), "expected to have link to go to parent folder");
+        }
+    }
+
+    @Nested
+    class GivenCachingBehavior {
+
+        private ByteArrayOutputStream output;
+
+        @BeforeEach
+        public void setup() {
+            output = new ByteArrayOutputStream();
+        }
+
+        @Test
+        public void whenNoneMatchesIsEqualEtag_shouldRespondNotModified() throws Exception {
+            handler.handle(request("GET /index.html HTTP/1.1")).send(output);
+            String etag = getEtag(output.toString());
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":" + etag));
+            assertEquals(new Response(NOT_MODIFIED), actualResponse);
+        }
+
+        @Test
+        public void whenIfMatchIsDifferentThenEtag_shouldRespondPreconditionFailed() throws Exception {
+            handler.handle(request("GET /index.html HTTP/1.1")).send(output);
+            String etag = "randometag";
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
+            assertEquals(new Response(PRECONDITION_FAILED), actualResponse);
+        }
+
+        @Test
+        public void whenIfMatchIsEqualToEtag_shouldRespondOk() throws Exception {
+            File f = new File(rootPath + "/index.html");
+            byte[] body = Files.readAllBytes(f.toPath());
+            BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+            Map<String, String> headers = Map.of(
+                    "Content-Type", "text/html",
+                    "Content-Length", "" + body.length,
+                    "ETag", StringUtil.toHex(f.getName() + attr.lastModifiedTime().toString() + attr.size())
+            );
+
+            handler.handle(request("GET /index.html HTTP/1.1")).send(output);
+            String etag = getEtag(output.toString());
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
+            assertEquals(new Response(OK, body, headers), actualResponse);
+        }
+
+        private String getEtag(String output) {
+            String[] lines = output.split("\n");
+            for (String line : lines) {
+                if (line.contains(ETAG))
+                    return line.split(":")[1].trim();
+            }
+            return "";
         }
     }
 }

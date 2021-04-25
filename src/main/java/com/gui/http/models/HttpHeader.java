@@ -1,4 +1,4 @@
-package com.gui.http;
+package com.gui.http.models;
 
 public class HttpHeader {
     public static final String CONTENT_TYPE = "Content-Type";

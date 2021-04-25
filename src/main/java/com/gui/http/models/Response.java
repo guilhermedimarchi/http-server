@@ -1,7 +1,5 @@
 package com.gui.http.models;
 
-import com.gui.http.HttpStatus;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;

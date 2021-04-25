@@ -11,7 +11,7 @@ Currently supports only GET and HEAD requests.
 Requires maven installed.
 Make sure you are in project root directory.
 
-Running unit tests:
+Run unit tests:
 
     mvn test
 

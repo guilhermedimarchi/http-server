@@ -20,7 +20,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.gui.http.HttpStatus.OK;
+import static com.gui.http.models.HttpStatus.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;
