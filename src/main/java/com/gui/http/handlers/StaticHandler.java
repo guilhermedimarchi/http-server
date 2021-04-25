@@ -17,7 +17,7 @@ import static com.gui.http.HttpStatus.*;
 
 public class StaticHandler implements HttpHandler {
 
-    private  String rootPath;
+    private String rootPath;
 
     public StaticHandler(String rootPath) {
         this.rootPath = rootPath;
@@ -64,7 +64,7 @@ public class StaticHandler implements HttpHandler {
         sb.append("<pre>Name | Last modified | Size</pre><hr/>");
 
         Path path = Paths.get(file.getPath());
-        if(path.getNameCount() > 1) {
+        if (path.getNameCount() > 1) {
             if (path.getNameCount() == 2) {
                 sb.append("<pre><a href=\"../\">../</a>\n");
             } else {
@@ -84,7 +84,7 @@ public class StaticHandler implements HttpHandler {
             sb.append("</a> | ");
             sb.append(attr.lastModifiedTime());
             sb.append(" | ");
-            if(sub.isDirectory())
+            if (sub.isDirectory())
                 sb.append(folderSize(sub));
             else
                 sb.append(attr.size());
