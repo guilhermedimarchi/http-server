@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class StaticHandlerTest {
     }
 
     private Request request(String content) throws Exception {
-        return new Request(new ByteArrayInputStream(content.getBytes()));
+        return new Request(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Nested
@@ -76,7 +77,6 @@ public class StaticHandlerTest {
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1"));
             assertEquals(new Response(OK, body, headers), actualResponse);
         }
-
     }
 
     @Nested
@@ -119,6 +119,13 @@ public class StaticHandlerTest {
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");
             assertTrue(response.contains("Index of ." + File.separator + "folder1" + File.separator + "folder2"), "expected to get HTML of ./folder1/folder2");
             assertTrue(response.contains("<a href=\"" + File.separator + "folder1\">../</a>"), "expected to have link to go to parent folder");
+        }
+
+        @Test
+        public void whenDirectoryNameHasSpaces_shouldReturnExplorer() throws Exception {
+            handler.handle(request("GET /folder1/folder2/folder%20with%20space HTTP/1.1")).send(out);
+            String response = out.toString();
+            assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
         }
     }
 

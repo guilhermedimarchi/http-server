@@ -1,20 +1,22 @@
 package com.gui.http.handlers;
 
 import com.gui.http.models.FileExplorerHtml;
-import com.gui.http.models.HttpMethod;
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
 import com.gui.http.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
 import static com.gui.http.models.HttpHeader.*;
-import static com.gui.http.models.HttpMethod.*;
+import static com.gui.http.models.HttpMethod.GET;
+import static com.gui.http.models.HttpMethod.HEAD;
 import static com.gui.http.models.HttpStatus.*;
 
 
@@ -31,7 +33,8 @@ public class StaticHandler implements HttpHandler {
         if (methodNotImplemented(request))
             return new Response(NOT_IMPLEMENTED);
 
-        File file = new File(rootPath + request.getPath());
+        String decodedPath = URLDecoder.decode(rootPath + request.getPath(), StandardCharsets.UTF_8);
+        File file = new File(decodedPath);
         if (!file.exists())
             return new Response(NOT_FOUND);
 
