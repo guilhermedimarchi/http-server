@@ -12,9 +12,9 @@ import java.util.Map;
 public class Request {
 
     private static final Logger LOGGER = Logger.getLogger(Request.class);
+    private final Map<String, String> headers = new HashMap<>();
     private String method;
     private String path;
-    private final Map<String, String> headers = new HashMap<>();
 
     public Request(InputStream input) throws RequestParseException, IOException {
         try {
@@ -33,13 +33,6 @@ public class Request {
         } catch (IOException e) {
             throw new IOException("could not parse request", e);
         }
-    }
-
-    private void setHeaders(String header) throws RequestParseException {
-        String[] members = header.split(":");
-        if (members.length < 2)
-            throw new RequestParseException("request headers malformed");
-        headers.put(members[0].trim(), members[1].trim());
     }
 
     private void setRequestLine(String line) throws RequestParseException {
@@ -63,5 +56,12 @@ public class Request {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    private void setHeaders(String header) throws RequestParseException {
+        String[] members = header.split(":");
+        if (members.length < 2)
+            throw new RequestParseException("request headers malformed");
+        headers.put(members[0].trim(), members[1].trim());
     }
 }

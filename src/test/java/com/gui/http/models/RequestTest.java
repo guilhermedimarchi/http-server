@@ -44,7 +44,7 @@ public class RequestTest {
     }
 
     @Test
-    public void whenHeadersAreMalformed_shouldThrowRequestParseException()  {
+    public void whenHeadersAreMalformed_shouldThrowRequestParseException() {
         RequestParseException ex = assertThrows(RequestParseException.class, () -> {
             createRequest("GET /image1.png HTTP/1.1\nAccept-Language");
         });

@@ -34,7 +34,7 @@ public class StaticHandler implements HttpHandler {
             return new Response(NOT_FOUND);
 
         String etag = getEtag(file);
-        if(etag.equals(request.getHeaders().get(IF_NONE_MATCH)))
+        if (etag.equals(request.getHeaders().get(IF_NONE_MATCH)))
             return new Response(NOT_MODIFIED);
 
         byte[] body;
@@ -59,10 +59,11 @@ public class StaticHandler implements HttpHandler {
 
     private String getContentType(File file) throws IOException {
         String type = Files.probeContentType(Paths.get(file.getAbsolutePath()));
-        if(type==null)
+        if (type == null)
             return "text/html";
         return type;
     }
+
     private String getEtag(File file) throws IOException {
         BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         return StringUtil.toHex(file.getName() + attr.lastModifiedTime().toString() + attr.size());

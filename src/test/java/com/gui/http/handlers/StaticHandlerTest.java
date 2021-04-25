@@ -85,14 +85,14 @@ public class StaticHandlerTest {
             firstResponse.send(output);
             String etag = getEtag(output.toString());
 
-            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n"+IF_NONE_MATCH+":"+etag));
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":" + etag));
             assertEquals(new Response(NOT_MODIFIED), actualResponse);
         }
 
         private String getEtag(String output) {
             String[] lines = output.split("\n");
-            for(String line : lines) {
-                if(line.contains(ETAG))
+            for (String line : lines) {
+                if (line.contains(ETAG))
                     return line.split(":")[1].trim();
             }
             return "";
@@ -116,7 +116,7 @@ public class StaticHandlerTest {
             assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");
             assertTrue(response.contains("<h1>Index of .</h1>"), "expected to get HTML for root directory");
-            assertTrue(response.contains("<pre><a href=\""+File.separator+"folder1\">folder1</a>"), "expected to get HTML for root directory");
+            assertTrue(response.contains("<pre><a href=\"" + File.separator + "folder1\">folder1</a>"), "expected to get HTML for root directory");
         }
 
         @Test
@@ -138,7 +138,7 @@ public class StaticHandlerTest {
             assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");
             assertTrue(response.contains("Index of ." + File.separator + "folder1" + File.separator + "folder2"), "expected to get HTML of ./folder1/folder2");
-            assertTrue(response.contains("<a href=\""+File.separator+"folder1\">../</a>"), "expected to have link to go to parent folder");
+            assertTrue(response.contains("<a href=\"" + File.separator + "folder1\">../</a>"), "expected to have link to go to parent folder");
         }
     }
 }
