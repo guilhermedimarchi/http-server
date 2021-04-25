@@ -13,7 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
-import static com.gui.http.HttpHeader.*;
+import static com.gui.http.HttpHeader.ETAG;
+import static com.gui.http.HttpHeader.IF_NONE_MATCH;
 import static com.gui.http.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -115,8 +116,7 @@ public class StaticHandlerTest {
             assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");
             assertTrue(response.contains("<h1>Index of .</h1>"), "expected to get HTML for root directory");
-            assertTrue(response.contains("<pre><a href=\"\\folder1\">folder1</a>"), "expected to get HTML for root directory");
-            assertTrue(response.contains("<pre><a href=\"\\index.html\">index.html</a>"), "expected to get HTML for root directory");
+            assertTrue(response.contains("<pre><a href=\""+File.separator+"folder1\">folder1</a>"), "expected to get HTML for root directory");
         }
 
         @Test
@@ -126,7 +126,7 @@ public class StaticHandlerTest {
             assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
             assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");
-            assertTrue(response.contains("<title>Index of .\\folder1</title>"), "expected to get HTML of ./folder1");
+            assertTrue(response.contains("Index of ." + File.separator + "folder1"), "expected to get HTML of ./folder1");
             assertTrue(response.contains("<a href=\"\">../</a>"), "expected to have link to go to parent folder");
         }
 
@@ -137,8 +137,8 @@ public class StaticHandlerTest {
             assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
             assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");
-            assertTrue(response.contains("<title>Index of .\\folder1\\folder2</title>"), "expected to get HTML of ./folder1/folder2");
-            assertTrue(response.contains("<a href=\"\\folder1\">../</a>"), "expected to have link to go to parent folder");
+            assertTrue(response.contains("Index of ." + File.separator + "folder1" + File.separator + "folder2"), "expected to get HTML of ./folder1/folder2");
+            assertTrue(response.contains("<a href=\""+File.separator+"folder1\">../</a>"), "expected to have link to go to parent folder");
         }
     }
 }

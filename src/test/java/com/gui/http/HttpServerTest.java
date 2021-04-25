@@ -3,12 +3,14 @@ package com.gui.http;
 import com.gui.http.handlers.HttpHandler;
 import com.gui.http.models.Response;
 import org.junit.jupiter.api.Test;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 import static com.gui.http.HttpStatus.OK;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 public class HttpServerTest {
