@@ -91,7 +91,6 @@ public class StaticHandlerTest {
         private String getEtag(String output) {
             String[] lines = output.split("\n");
             for(String line : lines) {
-                System.out.println(line);
                 if(line.contains(ETAG))
                     return line.split(":")[1].trim();
             }
@@ -111,7 +110,6 @@ public class StaticHandlerTest {
         @Test
         public void whenRootDirectory_shouldReturnExplorer() throws Exception {
             handler.handle(request("GET / HTTP/1.1")).send(out);
-
             String response = out.toString();
             assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
             assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
@@ -136,7 +134,6 @@ public class StaticHandlerTest {
         public void whenNestedDirectories_shouldReturnExplorer() throws Exception {
             handler.handle(request("GET /folder1/folder2 HTTP/1.1")).send(out);
             String response = out.toString();
-            System.out.println(response);
             assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
             assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
             assertTrue(response.contains("Content-Length: "), "expected to have content length header");

@@ -9,14 +9,20 @@ Currently supports only GET and HEAD requests.
 
 ### Without docker
 Requires maven installed.
+Make sure you are in project root directory.
 
-Inside project folder, run:
+Running unit tests:
+
+    mvn test
+
+Creating artifact:
 
     mvn clean package
 
 Then run artifact:
 
     java -jar target/http-server-1.0-SNAPSHOT.jar
+
 
 ### With docker
 
