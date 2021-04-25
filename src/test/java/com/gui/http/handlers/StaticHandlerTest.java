@@ -6,13 +6,16 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
 import static com.gui.http.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
 
@@ -74,52 +77,47 @@ public class StaticHandlerTest {
 
     @Nested
     class GivenPathIsDirectory {
+        private OutputStream out;
+
+        @BeforeEach
+        public void setup() {
+            out = new ByteArrayOutputStream();
+        }
 
         @Test
         public void whenRootDirectory_shouldReturnExplorer() throws Exception {
-            Response actualResponse = handler.handle(request("GET / HTTP/1.1"));
-            byte[] body = rootPageHtml().getBytes();
-            Map<String, String> headers = getHeadersFor(body);
-            assertEquals(new Response(OK, body, headers), actualResponse);
+            handler.handle(request("GET / HTTP/1.1")).send(out);
+
+            String response = out.toString();
+            assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
+            assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
+            assertTrue(response.contains("Content-Length: "), "expected to have content length header");
+            assertTrue(response.contains("<h1>Index of .</h1>"), "expected to get HTML for root directory");
+            assertTrue(response.contains("<pre><a href=\"\\folder1\">folder1</a>"), "expected to get HTML for root directory");
+            assertTrue(response.contains("<pre><a href=\"\\index.html\">index.html</a>"), "expected to get HTML for root directory");
         }
 
         @Test
         public void whenAccessingInsideDirectory_shouldReturnExplorer() throws Exception {
-            Response actualResponse = handler.handle(request("GET /folder1 HTTP/1.1"));
-            byte[] body = insideDirectoryHtml().getBytes();
-            Map<String, String> headers = getHeadersFor(body);
-            assertEquals(new Response(OK, body, headers), actualResponse);
+            handler.handle(request("GET /folder1 HTTP/1.1")).send(out);
+            String response = out.toString();
+            assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
+            assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
+            assertTrue(response.contains("Content-Length: "), "expected to have content length header");
+            assertTrue(response.contains("<title>Index of .\\folder1</title>"), "expected to get HTML of ./folder1");
+            assertTrue(response.contains("<a href=\"\">../</a>"), "expected to have link to go to parent folder");
         }
 
         @Test
         public void whenNestedDirectories_shouldReturnExplorer() throws Exception {
-            Response actualResponse = handler.handle(request("GET /folder1/folder2 HTTP/1.1"));
-            byte[] body = nestedDirectoriesHtml().getBytes();
-            Map<String, String> headers = getHeadersFor(body);
-            assertEquals(new Response(OK, body, headers), actualResponse);
-        }
-
-        @NotNull
-        private Map<String, String> getHeadersFor(byte[] body) {
-            return Map.of(
-                    "Content-Type", "text/html",
-                    "Content-Length", "" + body.length
-            );
-        }
-
-        private String rootPageHtml() {
-            return "<html><head><title>Index of </title></head><body><h1>Index of C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\\www</h1><pre>Name | Last modified | Size</pre><hr/><pre><a href=\"C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\">../</a>\n" +
-                    "<pre><a href=\"\\folder1\">folder1</a> | 2021-04-25T12:06:14.344388Z | 24 bytes</pre><pre><a href=\"\\index.html\">index.html</a> | 2021-04-25T09:02:41.643Z | 217 bytes</pre></body></html>";
-        }
-
-        private String insideDirectoryHtml() {
-            return "<html><head><title>Index of \\folder1</title></head><body><h1>Index of C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\\www\\folder1</h1><pre>Name | Last modified | Size</pre><hr/><pre><a href=\"\">../</a>\n" +
-                    "<pre><a href=\"\\folder1\\file1.txt\">file1.txt</a> | 2021-04-25T10:33:39.093Z | 15 bytes</pre><pre><a href=\"\\folder1\\folder2\">folder2</a> | 2021-04-25T12:06:14.340387Z | 9 bytes</pre></body></html>";
-        }
-
-        private String nestedDirectoriesHtml() {
-            return "<html><head><title>Index of \\folder1\\folder2</title></head><body><h1>Index of C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\\www\\folder1\\folder2</h1><pre>Name | Last modified | Size</pre><hr/><pre><a href=\"\\folder1\">../</a>\n" +
-                    "<pre><a href=\"\\folder1\\folder2\\file2.txt\">file2.txt</a> | 2021-04-25T10:33:19.442Z | 9 bytes</pre></body></html>";
+            handler.handle(request("GET /folder1/folder2 HTTP/1.1")).send(out);
+            String response = out.toString();
+            System.out.println(response);
+            assertTrue(response.contains("HTTP/1.1 200 Ok"), "expected to be 200 ok");
+            assertTrue(response.contains("Content-Type: text/html"), "expected to have content type header");
+            assertTrue(response.contains("Content-Length: "), "expected to have content length header");
+            assertTrue(response.contains("<title>Index of .\\folder1\\folder2</title>"), "expected to get HTML of ./folder1/folder2");
+            assertTrue(response.contains("<a href=\"\\folder1\">../</a>"), "expected to have link to go to parent folder");
         }
     }
 }
