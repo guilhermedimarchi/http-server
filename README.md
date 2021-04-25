@@ -20,22 +20,21 @@ Then run artifact:
 
 ### With docker
 
-Build docker image:
+Build docker image locally:
 
-
-    docker build -t webserver
+    docker build -t http-server .
 
 
 Run with default root path (will use default www folder with default content):
 
 
-    docker run -p 8080:8080 webserver
+    docker run -p 8080:8080 http-server
 
 
 Run with user specified root folder:
 
-    docker run -p 8080:8080 -v CUSTOM_PATH:/www webserver
+    docker run -p 8080:8080 -v CUSTOM_PATH:/www http-server
 
 Example:
 
-    docker run -p 8080:8080 -v C:/Users/Guilherme/Desktop:/www webserver
+    docker run -p 8080:8080 -v C:/Users/Guilherme/Desktop:/www http-server
