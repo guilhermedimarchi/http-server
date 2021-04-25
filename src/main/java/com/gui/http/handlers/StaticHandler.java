@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.gui.http.HttpHeader.*;
@@ -34,19 +33,23 @@ public class StaticHandler implements HttpHandler {
         if (!file.exists())
             return new Response(NOT_FOUND);
 
-        byte[] body;
-        Map<String, String> headers = new HashMap<>();
+        String etag = getEtag(file);
+        if(etag.equals(request.getHeaders().get(IF_NONE_MATCH)))
+            return new Response(NOT_MODIFIED);
 
+        byte[] body;
         if (file.isDirectory()) {
             FileExplorerHtml html = new FileExplorerHtml(file, rootPath);
             body = html.getHtmlBytes();
-            headers.put(CONTENT_TYPE, "text/html");
         } else {
             body = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-            headers.put(CONTENT_TYPE, Files.probeContentType(Paths.get(file.getAbsolutePath())));
         }
-        headers.put(CONTENT_LENGTH, "" + body.length);
-        headers.put(ETAG, getEtag(file));
+
+        Map<String, String> headers = Map.of(
+                CONTENT_TYPE, getContentType(file),
+                CONTENT_LENGTH, "" + body.length,
+                ETAG, etag
+        );
 
         if ("HEAD".equals(request.getMethod()))
             return new Response(OK, null, headers);
@@ -54,6 +57,12 @@ public class StaticHandler implements HttpHandler {
             return new Response(OK, body, headers);
     }
 
+    private String getContentType(File file) throws IOException {
+        String type = Files.probeContentType(Paths.get(file.getAbsolutePath()));
+        if(type==null)
+            return "text/html";
+        return type;
+    }
     private String getEtag(File file) throws IOException {
         BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
         return StringUtil.toHex(file.getName() + attr.lastModifiedTime().toString() + attr.size());

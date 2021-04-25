@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
+import static com.gui.http.HttpHeader.*;
 import static com.gui.http.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -76,6 +77,26 @@ public class StaticHandlerTest {
             assertEquals(new Response(OK, body, headers), actualResponse);
         }
 
+        @Test
+        public void whenEtagMatches_shouldRespond304() throws Exception {
+            Response firstResponse = handler.handle(request("GET /index.html HTTP/1.1"));
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            firstResponse.send(output);
+            String etag = getEtag(output.toString());
+
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n"+IF_NONE_MATCH+":"+etag));
+            assertEquals(new Response(NOT_MODIFIED), actualResponse);
+        }
+
+        private String getEtag(String output) {
+            String[] lines = output.split("\n");
+            for(String line : lines) {
+                System.out.println(line);
+                if(line.contains(ETAG))
+                    return line.split(":")[1].trim();
+            }
+            return "";
+        }
     }
 
     @Nested
@@ -123,4 +144,6 @@ public class StaticHandlerTest {
             assertTrue(response.contains("<a href=\"\\folder1\">../</a>"), "expected to have link to go to parent folder");
         }
     }
+
+
 }
