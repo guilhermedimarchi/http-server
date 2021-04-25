@@ -48,7 +48,7 @@ public class StaticHandlerTest {
             headers = Map.of(
                     "Content-Type", "text/html",
                     "Content-Length", "" + body.length,
-                    "ETag", StringUtil.toHex(attr.lastModifiedTime().toString()) + StringUtil.toHex(attr.size() + "")
+                    "ETag", StringUtil.toHex(f.getName() + attr.lastModifiedTime().toString() + attr.size())
             );
         }
 

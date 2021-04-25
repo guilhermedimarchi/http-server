@@ -1,13 +1,11 @@
 package com.gui.http.handlers;
 
-import com.gui.http.HttpHeader;
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
 import com.gui.http.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -47,15 +45,17 @@ public class StaticHandler implements HttpHandler {
             headers.put(CONTENT_TYPE, Files.probeContentType(Paths.get(file.getAbsolutePath())));
         }
         headers.put(CONTENT_LENGTH, "" + body.length);
-
-        BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-        String etag = StringUtil.toHex(attr.lastModifiedTime().toString()) + StringUtil.toHex(attr.size() + "");
-        headers.put(ETAG, etag);
+        headers.put(ETAG, getEtag(file));
 
         if ("HEAD".equals(request.getMethod()))
             return new Response(OK, null, headers);
         else
             return new Response(OK, body, headers);
+    }
+
+    private String getEtag(File file) throws IOException {
+        BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+        return StringUtil.toHex(file.getName() + attr.lastModifiedTime().toString() + attr.size());
     }
 
     private boolean methodNotImplemented(Request request) {
