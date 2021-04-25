@@ -25,7 +25,7 @@ public class Request {
             setRequestLine(requestLine);
 
             String header = in.readLine();
-            while (header != null) {
+            while (header != null && !header.isBlank()) {
                 setHeaders(header);
                 header = in.readLine();
             }

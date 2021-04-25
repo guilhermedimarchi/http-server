@@ -141,6 +141,4 @@ public class StaticHandlerTest {
             assertTrue(response.contains("<a href=\"\\folder1\">../</a>"), "expected to have link to go to parent folder");
         }
     }
-
-
 }

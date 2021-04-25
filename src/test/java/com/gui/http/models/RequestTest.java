@@ -34,7 +34,7 @@ public class RequestTest {
 
     @Test
     public void whenHeadersArePresent_shouldParseRequest() throws Exception {
-        Request r = createRequest("GET /image1.png HTTP/1.1\nAccept-Language: en-us\nConnection:Keep-Alive\n");
+        Request r = createRequest("GET /image1.png HTTP/1.1\nAccept-Language: en-us\nConnection:Keep-Alive\n\n");
         assertEquals("GET", r.getMethod());
         assertEquals("/image1.png", r.getPath());
         Map<String, String> actualHeaders = r.getHeaders();
@@ -44,7 +44,7 @@ public class RequestTest {
     }
 
     @Test
-    public void whenHeadersAreMalformed_shouldThrowRequestParseException() throws Exception {
+    public void whenHeadersAreMalformed_shouldThrowRequestParseException()  {
         RequestParseException ex = assertThrows(RequestParseException.class, () -> {
             createRequest("GET /image1.png HTTP/1.1\nAccept-Language");
         });
