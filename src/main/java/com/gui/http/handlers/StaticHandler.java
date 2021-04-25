@@ -5,10 +5,9 @@ import com.gui.http.models.Response;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,8 +83,12 @@ public class StaticHandler implements HttpHandler {
             html.append("</a> | ");
             html.append(attr.lastModifiedTime());
             html.append(" | ");
-            if (nestedFile.isDirectory())
+            if (nestedFile.isDirectory()) {
+                System.out.println(new Date());
                 html.append(folderSize(nestedFile));
+                System.out.println(new Date());
+            }
+
             else
                 html.append(attr.size());
             html.append(" bytes");
@@ -97,10 +100,25 @@ public class StaticHandler implements HttpHandler {
     }
 
     private long folderSize(File directory) throws IOException {
-        return Files.walk(directory.toPath()).mapToLong( p -> p.toFile().length() ).sum();
+        FileVisitor total = new FileVisitor();
+        Files.walkFileTree(directory.toPath(), total);
+        return total.getSize();
     }
 
     private boolean methodNotImplemented(Request request) {
         return !"GET".equals(request.getMethod()) && !"HEAD".equals(request.getMethod());
+    }
+
+    private class FileVisitor extends SimpleFileVisitor<Path> {
+        private long size;
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            this.size += attrs.size();
+            return FileVisitResult.CONTINUE;
+        }
+        public long getSize() {
+            return size;
+        }
     }
 }
