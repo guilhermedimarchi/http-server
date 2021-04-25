@@ -51,60 +51,53 @@ public class StaticHandler implements HttpHandler {
     }
 
     private byte[] fileExplorerHtml(File file) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
-        sb.append("<head><title>Index of ");
-        sb.append(file.getPath().replace(rootPath, ""));
-        sb.append("</title>");
-        sb.append("</head>");
-        sb.append("<body>");
-        sb.append("<h1>Index of ");
-        sb.append(file.getPath());
-        sb.append("</h1>");
-        sb.append("<pre>Name | Last modified | Size</pre><hr/>");
+        StringBuilder html = new StringBuilder();
+        html.append("<html>");
+        html.append("<head><title>Index of ");
+        html.append(file.getPath().replace(rootPath, ""));
+        html.append("</title>");
+        html.append("</head>");
+        html.append("<body>");
+        html.append("<h1>Index of ");
+        html.append(file.getPath());
+        html.append("</h1>");
+        html.append("<pre>Name | Last modified | Size</pre><hr/>");
 
         Path path = Paths.get(file.getPath());
         if (path.getNameCount() > 1) {
             if (path.getNameCount() == 2) {
-                sb.append("<pre><a href=\"../\">../</a>\n");
+                html.append("<pre><a href=\"../\">../</a>\n");
             } else {
-                sb.append("<pre><a href=\"");
-                sb.append(path.getParent().toString().replace(rootPath, ""));
-                sb.append("\">../</a>\n");
+                html.append("<pre><a href=\"");
+                html.append(path.getParent().toString().replace(rootPath, ""));
+                html.append("\">../</a>\n");
             }
         }
 
-        for (File sub : file.listFiles()) {
-            String filePath = sub.getPath().replace(rootPath, "");
-            BasicFileAttributes attr = Files.readAttributes(Paths.get(sub.getPath()), BasicFileAttributes.class);
-            sb.append("<pre><a href=\"");
-            sb.append(filePath);
-            sb.append("\">");
-            sb.append(sub.getName());
-            sb.append("</a> | ");
-            sb.append(attr.lastModifiedTime());
-            sb.append(" | ");
-            if (sub.isDirectory())
-                sb.append(folderSize(sub));
+        for (File nestedFile : file.listFiles()) {
+            String filePath = nestedFile.getPath().replace(rootPath, "");
+            BasicFileAttributes attr = Files.readAttributes(nestedFile.toPath(), BasicFileAttributes.class);
+            html.append("<pre><a href=\"");
+            html.append(filePath);
+            html.append("\">");
+            html.append(nestedFile.getName());
+            html.append("</a> | ");
+            html.append(attr.lastModifiedTime());
+            html.append(" | ");
+            if (nestedFile.isDirectory())
+                html.append(folderSize(nestedFile));
             else
-                sb.append(attr.size());
-            sb.append(" bytes");
-            sb.append("</pre>");
+                html.append(attr.size());
+            html.append(" bytes");
+            html.append("</pre>");
         }
-        sb.append("</body>");
-        sb.append("</html>");
-        return sb.toString().getBytes();
+        html.append("</body>");
+        html.append("</html>");
+        return html.toString().getBytes();
     }
 
-    private long folderSize(File directory) {
-        long length = 0;
-        for (File file : directory.listFiles()) {
-            if (file.isFile())
-                length += file.length();
-            else
-                length += folderSize(file);
-        }
-        return length;
+    private long folderSize(File directory) throws IOException {
+        return Files.walk(directory.toPath()).mapToLong( p -> p.toFile().length() ).sum();
     }
 
     private boolean methodNotImplemented(Request request) {
