@@ -12,7 +12,7 @@ public class HttpServer {
 
     private static final Logger LOGGER = Logger.getLogger(HttpServer.class);
     private final int port;
-    private HttpHandler handler = new StaticHandler("./");
+    private HttpHandler handler = new StaticHandler("./www");
 
     public HttpServer(int port) throws IOException {
         this.port = port;

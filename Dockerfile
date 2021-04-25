@@ -6,8 +6,8 @@ RUN mvn dependency:go-offline -B
 COPY ./src ./src
 RUN mvn package
 
-
 FROM openjdk:11-jre-slim
-COPY --from=build /app/target/http-server-*.jar ./
+
+COPY --from=build app/target/http-server-*.jar ./http-server.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","http-server-1.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","http-server.jar"]
