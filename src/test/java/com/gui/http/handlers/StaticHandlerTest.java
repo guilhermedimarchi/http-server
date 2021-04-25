@@ -2,7 +2,7 @@ package com.gui.http.handlers;
 
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
-import org.jetbrains.annotations.NotNull;
+import com.gui.http.util.StringUtil;
 import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayInputStream;
@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
 import static com.gui.http.HttpStatus.*;
@@ -23,7 +23,6 @@ public class StaticHandlerTest {
 
     private static final String rootPath = new File("./src/test/resources/www").getAbsolutePath();
     private StaticHandler handler;
-
 
     @BeforeEach
     public void setup() {
@@ -43,10 +42,13 @@ public class StaticHandlerTest {
 
         @BeforeAll
         public void beforeAll() throws Exception {
-            body = Files.readAllBytes(Paths.get(rootPath + "/index.html"));
+            File f = new File(rootPath + "/index.html");
+            body = Files.readAllBytes(f.toPath());
+            BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
             headers = Map.of(
                     "Content-Type", "text/html",
-                    "Content-Length", "" + body.length
+                    "Content-Length", "" + body.length,
+                    "ETag", StringUtil.toHex(attr.lastModifiedTime().toString()) + StringUtil.toHex(attr.size() + "")
             );
         }
 
@@ -73,6 +75,7 @@ public class StaticHandlerTest {
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1"));
             assertEquals(new Response(OK, body, headers), actualResponse);
         }
+
     }
 
     @Nested
