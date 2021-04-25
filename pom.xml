@@ -54,7 +54,6 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>com.gui.App</mainClass>
                         </manifest>
                     </archive>
