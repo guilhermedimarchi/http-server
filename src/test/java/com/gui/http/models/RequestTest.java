@@ -3,9 +3,9 @@ package com.gui.http.models;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RequestTest {
 
@@ -21,7 +21,7 @@ public class RequestTest {
         RequestParseException ex = assertThrows(RequestParseException.class, () -> {
             createRequest("");
         });
-        assertEquals("request cannot be null or blank", ex.getMessage());
+        assertEquals("request line cannot be null or blank", ex.getMessage());
     }
 
     @Test
@@ -30,6 +30,25 @@ public class RequestTest {
             createRequest("wrongformat");
         });
         assertEquals("missing http method or path", ex.getMessage());
+    }
+
+    @Test
+    public void whenHeadersArePresent_shouldParseRequest() throws Exception {
+        Request r = createRequest("GET /image1.png HTTP/1.1\nAccept-Language: en-us\nConnection:Keep-Alive\n");
+        assertEquals("GET", r.getMethod());
+        assertEquals("/image1.png", r.getPath());
+        Map<String, String> actualHeaders = r.getHeaders();
+        assertFalse(actualHeaders.isEmpty(), "headers should not be empty");
+        assertEquals("en-us", actualHeaders.get("Accept-Language"));
+        assertEquals("Keep-Alive", actualHeaders.get("Connection"));
+    }
+
+    @Test
+    public void whenHeadersAreMalformed_shouldThrowRequestParseException() throws Exception {
+        RequestParseException ex = assertThrows(RequestParseException.class, () -> {
+            createRequest("GET /image1.png HTTP/1.1\nAccept-Language");
+        });
+        assertEquals("request headers malformed", ex.getMessage());
     }
 
     private Request createRequest(String content) throws Exception {

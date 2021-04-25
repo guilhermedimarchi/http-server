@@ -1,4 +1,4 @@
-package com.gui.http.handlers;
+package com.gui.http.models;
 
 import java.io.File;
 import java.io.IOException;
