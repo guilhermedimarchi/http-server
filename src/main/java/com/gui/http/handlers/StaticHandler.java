@@ -84,13 +84,10 @@ public class StaticHandler implements HttpHandler {
             html.append(attr.lastModifiedTime());
             html.append(" | ");
             if (nestedFile.isDirectory()) {
-                System.out.println(new Date());
                 html.append(folderSize(nestedFile));
-                System.out.println(new Date());
-            }
-
-            else
+            }else {
                 html.append(attr.size());
+            }
             html.append(" bytes");
             html.append("</pre>");
         }
