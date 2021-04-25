@@ -34,6 +34,9 @@ public class StaticHandler implements HttpHandler {
             return new Response(NOT_FOUND);
 
         String etag = getEtag(file);
+        if(request.getHeaders().containsKey(IF_MATCH) && !etag.equals(request.getHeaders().get(IF_MATCH)))
+            return new Response(PRECONDITION_FAILED);
+
         if (etag.equals(request.getHeaders().get(IF_NONE_MATCH)))
             return new Response(NOT_MODIFIED);
 

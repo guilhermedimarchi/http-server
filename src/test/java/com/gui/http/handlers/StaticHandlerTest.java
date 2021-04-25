@@ -13,8 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 
-import static com.gui.http.HttpHeader.ETAG;
-import static com.gui.http.HttpHeader.IF_NONE_MATCH;
+import static com.gui.http.HttpHeader.*;
 import static com.gui.http.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -79,7 +78,7 @@ public class StaticHandlerTest {
         }
 
         @Test
-        public void whenEtagMatches_shouldRespond304() throws Exception {
+        public void whenEtagNoneMatchesIsSame_shouldRespondNotModified() throws Exception {
             Response firstResponse = handler.handle(request("GET /index.html HTTP/1.1"));
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             firstResponse.send(output);
@@ -87,6 +86,28 @@ public class StaticHandlerTest {
 
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":" + etag));
             assertEquals(new Response(NOT_MODIFIED), actualResponse);
+        }
+
+        @Test
+        public void whenIfMatchIsDifferentThenEtag_shouldRespondPreconditionFailed() throws Exception {
+            Response firstResponse = handler.handle(request("GET /index.html HTTP/1.1"));
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            firstResponse.send(output);
+            String etag = "randometag";
+
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
+            assertEquals(new Response(PRECONDITION_FAILED), actualResponse);
+        }
+
+        @Test
+        public void whenIfMatchIsEqualToEtag_shouldRespondOk() throws Exception {
+            Response firstResponse = handler.handle(request("GET /index.html HTTP/1.1"));
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            firstResponse.send(output);
+            String etag = getEtag(output.toString());
+
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
+            assertEquals(new Response(OK, body, headers), actualResponse);
         }
 
         private String getEtag(String output) {
