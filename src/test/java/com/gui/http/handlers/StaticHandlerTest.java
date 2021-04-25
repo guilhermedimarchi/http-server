@@ -2,6 +2,7 @@ package com.gui.http.handlers;
 
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StaticHandlerTest {
 
-    private static final String rootPath = new File("./src/test/resources").getAbsolutePath();
+    private static final String rootPath = new File("./src/test/resources/www").getAbsolutePath();
     private static byte[] body;
     private static Map<String, String> headers;
     private StaticHandler handler;
@@ -62,9 +63,50 @@ public class StaticHandlerTest {
     }
 
     @Test
-    public void whenPathIsDirectory_shouldRespondNotFound() throws Exception {
+    public void whenPathIsDirectory_shouldReturnExplorer() throws Exception {
         Response actualResponse = handler.handle(request("GET / HTTP/1.1"));
-        assertEquals(new Response(NOT_FOUND), actualResponse);
+        byte[] body = rootPageHtml().getBytes();
+        Map<String, String> headers = getHeadersFor(body);
+        assertEquals(new Response(OK, body, headers), actualResponse);
+    }
+
+    @Test
+    public void whenPathIsDirectoryAndInsideDirectory_shouldReturnExplorer() throws Exception {
+        Response actualResponse = handler.handle(request("GET /folder1 HTTP/1.1"));
+        byte[] body = insideDirectoryHtml().getBytes();
+        Map<String, String> headers = getHeadersFor(body);
+        assertEquals(new Response(OK, body, headers), actualResponse);
+    }
+
+    @Test
+    public void whenNestedDirectories_shouldReturnExplorer() throws Exception {
+        Response actualResponse = handler.handle(request("GET /folder1/folder2 HTTP/1.1"));
+        byte[] body = nestedDirectoriesHtml().getBytes();
+        Map<String, String> headers = getHeadersFor(body);
+        assertEquals(new Response(OK, body, headers), actualResponse);
+    }
+
+    @NotNull
+    private Map<String, String> getHeadersFor(byte[] body) {
+        return Map.of(
+                "Content-Type", "text/html",
+                "Content-Length", "" + body.length
+        );
+    }
+
+    private String rootPageHtml() {
+        return"<html><head><title>Index of </title></head><body><h1>Index of C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\\www</h1><pre>Name | Last modified | Size</pre><hr/><pre><a href=\"C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\">../</a>\n" +
+                "<pre><a href=\"\\folder1\">folder1</a> | 2021-04-25T12:06:14.344388Z | 24 bytes</pre><pre><a href=\"\\index.html\">index.html</a> | 2021-04-25T09:02:41.643Z | 217 bytes</pre></body></html>";
+    }
+
+    private String insideDirectoryHtml() {
+        return"<html><head><title>Index of \\folder1</title></head><body><h1>Index of C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\\www\\folder1</h1><pre>Name | Last modified | Size</pre><hr/><pre><a href=\"\">../</a>\n" +
+                "<pre><a href=\"\\folder1\\file1.txt\">file1.txt</a> | 2021-04-25T10:33:39.093Z | 15 bytes</pre><pre><a href=\"\\folder1\\folder2\">folder2</a> | 2021-04-25T12:06:14.340387Z | 9 bytes</pre></body></html>";
+    }
+
+    private String nestedDirectoriesHtml() {
+        return"<html><head><title>Index of \\folder1\\folder2</title></head><body><h1>Index of C:\\Users\\Guilherme\\Desktop\\http-server\\.\\src\\test\\resources\\www\\folder1\\folder2</h1><pre>Name | Last modified | Size</pre><hr/><pre><a href=\"\\folder1\">../</a>\n" +
+                "<pre><a href=\"\\folder1\\folder2\\file2.txt\">file2.txt</a> | 2021-04-25T10:33:19.442Z | 9 bytes</pre></body></html>";
     }
 
     private Request request(String content) throws Exception {
