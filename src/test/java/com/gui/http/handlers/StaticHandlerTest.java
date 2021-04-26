@@ -2,7 +2,6 @@ package com.gui.http.handlers;
 
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
-import com.gui.http.util.HttpUtil;
 import com.gui.http.util.StringUtil;
 import org.junit.jupiter.api.*;
 
@@ -25,7 +24,7 @@ import java.util.TimeZone;
 
 import static com.gui.http.util.HttpHeader.*;
 import static com.gui.http.util.HttpStatus.*;
-import static com.gui.http.util.HttpUtil.*;
+import static com.gui.http.util.HttpUtil.HTTP_DATE_FORMAT;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
