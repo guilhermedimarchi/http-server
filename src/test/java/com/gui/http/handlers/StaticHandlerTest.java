@@ -16,8 +16,7 @@ import java.util.Map;
 
 import static com.gui.http.models.HttpHeader.*;
 import static com.gui.http.models.HttpStatus.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
 
@@ -156,20 +155,16 @@ public class StaticHandlerTest {
         }
 
         @Test
-        public void whenIfMatchIsEqualToEtag_shouldRespondOk() throws Exception {
-            File f = new File(rootPath + "/index.html");
-            byte[] body = Files.readAllBytes(f.toPath());
-            BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
-            Map<String, String> headers = Map.of(
-                    "Content-Type", "text/html",
-                    "Content-Length", "" + body.length,
-                    "ETag", StringUtil.toHex(f.getName() + attr.lastModifiedTime().toString() + attr.size())
-            );
-
+        public void whenIfMatchIsEqualToEtag_shouldProceedWithRequest() throws Exception {
             handler.handle(request("GET /index.html HTTP/1.1")).send(output);
             String etags = "etag1,etag2," + getEtag(output.toString());
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etags));
-            assertEquals(new Response(OK, body, headers), actualResponse);
+            assertNotEquals(new Response(PRECONDITION_FAILED), actualResponse);
+        }
+        @Test
+        public void whenIfMatchIsStar_shouldProceedWithRequest() throws Exception {
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ": *"));
+            assertNotEquals(new Response(PRECONDITION_FAILED), actualResponse);
         }
 
         private String getEtag(String output) {
