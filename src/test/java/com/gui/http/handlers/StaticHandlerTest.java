@@ -167,8 +167,8 @@ public class StaticHandlerTest {
             );
 
             handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-            String etag = getEtag(output.toString());
-            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
+            String etags = "etag1,etag2," + getEtag(output.toString());
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etags));
             assertEquals(new Response(OK, body, headers), actualResponse);
         }
 
