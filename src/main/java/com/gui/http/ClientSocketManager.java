@@ -4,16 +4,11 @@ import com.gui.http.handlers.HttpHandler;
 import com.gui.http.models.Request;
 import com.gui.http.models.RequestParseException;
 import com.gui.http.models.Response;
-import com.gui.http.util.StringUtil;
 import org.apache.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
 
-import static com.gui.http.util.HttpHeader.IF_MATCH;
 import static com.gui.http.util.HttpStatus.BAD_REQUEST;
 import static com.gui.http.util.HttpStatus.INTERNAL_SERVER_ERROR;
 
@@ -34,7 +29,6 @@ public class ClientSocketManager implements Runnable {
             Response response;
             try {
                 Request request = new Request(socket.getInputStream());
-
                 response = handler.handle(request);
             } catch (RequestParseException e) {
                 LOGGER.error("bad request", e);
@@ -49,23 +43,10 @@ public class ClientSocketManager implements Runnable {
         } finally {
             try {
                 socket.close();
+                LOGGER.info("Closing connection: " + socket);
             } catch (IOException e) {
                 LOGGER.error("could not close socket", e);
             }
         }
-    }
-
-    private boolean ifMatch(Request request, String etag) {
-        if (!request.getHeaders().containsKey(IF_MATCH))
-            return false;
-
-        String etags = request.getHeaders().get(IF_MATCH);
-        return !(etags.contains("*") || etags.contains(etag));
-    }
-
-
-    private String getEtag(File file) throws IOException {
-        BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-        return StringUtil.toHex(file.getName() + attr.lastModifiedTime().toString() + attr.size());
     }
 }
