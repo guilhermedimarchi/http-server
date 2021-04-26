@@ -73,9 +73,7 @@ public class StaticHandler implements HttpHandler {
     }
 
     private boolean checkIfMatch(Request request, String etag) {
-        if (!request.getHeaders().containsKey(IF_MATCH) || request.getHeaders().get(IF_MATCH).contains(etag))
-            return false;
-        return true;
+        return request.getHeaders().containsKey(IF_MATCH) && !request.getHeaders().get(IF_MATCH).contains(etag);
     }
 
     private String getContentType(File file) throws IOException {
