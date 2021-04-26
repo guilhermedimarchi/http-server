@@ -2,7 +2,6 @@ package com.gui.http.handlers;
 
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
-import com.gui.http.util.StringUtil;
 import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayInputStream;
@@ -11,21 +10,13 @@ import java.io.File;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
-import static com.gui.http.util.HttpHeader.*;
+import static com.gui.http.util.HttpHeader.CONTENT_LENGTH;
+import static com.gui.http.util.HttpHeader.CONTENT_TYPE;
 import static com.gui.http.util.HttpStatus.*;
-import static com.gui.http.util.HttpUtil.HTTP_DATE_FORMAT;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
 
@@ -49,21 +40,14 @@ public class StaticHandlerTest {
 
         private byte[] body;
         private Map<String, String> headers;
-        private final DateFormat formatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
 
         @BeforeAll
         public void beforeAll() throws Exception {
             File f = new File(rootPath + "/index.html");
             body = Files.readAllBytes(f.toPath());
-            BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
-            FileTime lastModified = attr.lastModifiedTime();
-            formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
             headers = Map.of(
                     CONTENT_TYPE, "text/html",
-                    CONTENT_LENGTH, "" + body.length,
-                    ETAG, StringUtil.toHex(f.getName() + attr.lastModifiedTime().toString() + attr.size()),
-                    LAST_MODIFIED, formatter.format(new Date((lastModified.toMillis()))),
-                    CACHE_CONTROL, "max-age=0"
+                    CONTENT_LENGTH, "" + body.length
             );
         }
 
@@ -142,88 +126,4 @@ public class StaticHandlerTest {
         }
     }
 
-    @Nested
-    class GivenCachingBehavior {
-
-        private ByteArrayOutputStream output;
-
-        @BeforeEach
-        public void setup() {
-            output = new ByteArrayOutputStream();
-        }
-
-        @Nested
-        class GivenIfNoneMatchHeader {
-            @Test
-            public void whenIsEqualEtag_shouldRespondNotModified() throws Exception {
-                handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-                String etags = "etag1,etag2," + headerValueOf(ETAG, output.toString());
-                Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":" + etags));
-                assertEquals(new Response(NOT_MODIFIED), actualResponse);
-            }
-
-            @Test
-            public void whenIsStar_shouldRespondNotModified() throws Exception {
-                Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":*"));
-                assertEquals(new Response(NOT_MODIFIED), actualResponse);
-            }
-        }
-
-        @Nested
-        class GivenIfMatchHeader {
-            @Test
-            public void whenIsDifferentThenEtag_shouldRespondPreconditionFailed() throws Exception {
-                handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-                String etag = "randometag";
-                Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etag));
-                assertEquals(new Response(PRECONDITION_FAILED), actualResponse);
-            }
-
-            @Test
-            public void whenIsEqualToEtag_shouldProceedWithRequest() throws Exception {
-                handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-                String etags = "etag1,etag2," + headerValueOf(ETAG, output.toString());
-                Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etags));
-                assertNotEquals(new Response(PRECONDITION_FAILED), actualResponse);
-            }
-
-            @Test
-            public void whenIsStar_shouldProceedWithRequest() throws Exception {
-                Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ": *"));
-                assertNotEquals(new Response(PRECONDITION_FAILED), actualResponse);
-            }
-        }
-
-        @Nested
-        class GivenIfModifiedSinceHeader {
-
-            @Test
-            public void whenResourceIsSameDate_shouldRespondNotModified() throws Exception {
-                handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-                Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MODIFIED_SINCE + ":" + headerValueOf(LAST_MODIFIED, output.toString())));
-                assertEquals(new Response(NOT_MODIFIED), actualResponse);
-            }
-
-            @Test
-            public void whenResourceIsNewer_shouldProceedWithRequest() throws Exception {
-                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT);
-
-                handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-                ZonedDateTime date = ZonedDateTime.parse(headerValueOf(LAST_MODIFIED, output.toString()), dateFormatter).minusDays(1);
-
-                Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MODIFIED_SINCE + ":" + dateFormatter.format(date)));
-                assertNotEquals(new Response(NOT_MODIFIED), actualResponse);
-            }
-        }
-
-        private String headerValueOf(String header, String response) {
-            String[] lines = response.split("\n");
-            for (String line : lines) {
-                if (line.contains(header))
-                    return line.substring(line.indexOf(":") + 1).trim();
-            }
-            return "";
-        }
-
-    }
 }

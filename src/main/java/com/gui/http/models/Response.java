@@ -5,6 +5,7 @@ import com.gui.http.util.HttpStatus;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -12,7 +13,7 @@ public class Response {
 
     private final HttpStatus status;
     private byte[] body;
-    private Map<String, String> headers;
+    private Map<String, String> headers = new HashMap<>();
 
     public Response(HttpStatus status) {
         this.status = status;
@@ -71,4 +72,10 @@ public class Response {
         result = 31 * result + Arrays.hashCode(body);
         return result;
     }
+
+    public void addHeaders(Map<String, String> headers) {
+        this.headers.putAll(headers);
+    }
+
+
 }
