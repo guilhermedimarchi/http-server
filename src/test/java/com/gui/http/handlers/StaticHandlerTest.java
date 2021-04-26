@@ -12,10 +12,18 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
-import static com.gui.http.models.HttpHeader.*;
-import static com.gui.http.models.HttpStatus.*;
+import static com.gui.http.util.HttpHeader.*;
+import static com.gui.http.util.HttpStatus.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -40,16 +48,20 @@ public class StaticHandlerTest {
 
         private byte[] body;
         private Map<String, String> headers;
+        private DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss \'GMT\'", Locale.US);
 
         @BeforeAll
         public void beforeAll() throws Exception {
             File f = new File(rootPath + "/index.html");
             body = Files.readAllBytes(f.toPath());
             BasicFileAttributes attr = Files.readAttributes(f.toPath(), BasicFileAttributes.class);
+            FileTime lastModified = attr.lastModifiedTime();
+            formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
             headers = Map.of(
-                    "Content-Type", "text/html",
-                    "Content-Length", "" + body.length,
-                    "ETag", StringUtil.toHex(f.getName() + attr.lastModifiedTime().toString() + attr.size())
+                    CONTENT_TYPE, "text/html",
+                    CONTENT_LENGTH, "" + body.length,
+                    ETAG, StringUtil.toHex(f.getName() + attr.lastModifiedTime().toString() + attr.size()),
+                    LAST_MODIFIED, formatter.format(new Date((lastModified.toMillis())))
             );
         }
 
@@ -141,7 +153,7 @@ public class StaticHandlerTest {
         @Test
         public void whenIfNoneMatchIsEqualEtag_shouldRespondNotModified() throws Exception {
             handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-            String etags = "etag1,etag2," + getEtag(output.toString());
+            String etags = "etag1,etag2," + headerValueOf(ETAG, output.toString());
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":" + etags));
             assertEquals(new Response(NOT_MODIFIED), actualResponse);
         }
@@ -163,7 +175,7 @@ public class StaticHandlerTest {
         @Test
         public void whenIfMatchIsEqualToEtag_shouldProceedWithRequest() throws Exception {
             handler.handle(request("GET /index.html HTTP/1.1")).send(output);
-            String etags = "etag1,etag2," + getEtag(output.toString());
+            String etags = "etag1,etag2," + headerValueOf(ETAG, output.toString());
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etags));
             assertNotEquals(new Response(PRECONDITION_FAILED), actualResponse);
         }
@@ -174,11 +186,29 @@ public class StaticHandlerTest {
             assertNotEquals(new Response(PRECONDITION_FAILED), actualResponse);
         }
 
-        private String getEtag(String output) {
-            String[] lines = output.split("\n");
+        @Test
+        public void whenIfModifiedSince_shouldRespondNotModified() throws Exception {
+            handler.handle(request("GET /index.html HTTP/1.1")).send(output);
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MODIFIED_SINCE + ":" + headerValueOf(LAST_MODIFIED, output.toString())));
+            assertEquals(new Response(NOT_MODIFIED), actualResponse);
+        }
+
+        @Test
+        public void whenResourceIsNewerThenClientCache_shouldProceedWithRequest() throws Exception {
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z");
+
+            handler.handle(request("GET /index.html HTTP/1.1")).send(output);
+            ZonedDateTime date = ZonedDateTime.parse(headerValueOf(LAST_MODIFIED, output.toString()), dateFormatter).minusDays(1);
+
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MODIFIED_SINCE + ":" + dateFormatter.format(date)));
+            assertNotEquals(new Response(NOT_MODIFIED), actualResponse);
+        }
+
+        private String headerValueOf(String header, String response) {
+            String[] lines = response.split("\n");
             for (String line : lines) {
-                if (line.contains(ETAG))
-                    return line.split(":")[1].trim();
+                if (line.contains(header))
+                    return line.substring(line.indexOf(":") + 1).trim();
             }
             return "";
         }

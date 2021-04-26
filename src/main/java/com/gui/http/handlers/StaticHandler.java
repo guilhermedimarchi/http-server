@@ -3,6 +3,7 @@ package com.gui.http.handlers;
 import com.gui.http.models.FileExplorerHtml;
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
+import com.gui.http.util.HttpUtil;
 import com.gui.http.util.StringUtil;
 
 import java.io.File;
@@ -12,12 +13,21 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
-import static com.gui.http.models.HttpHeader.*;
-import static com.gui.http.models.HttpMethod.GET;
-import static com.gui.http.models.HttpMethod.HEAD;
-import static com.gui.http.models.HttpStatus.*;
+import static com.gui.http.util.HttpHeader.*;
+import static com.gui.http.util.HttpMethod.GET;
+import static com.gui.http.util.HttpMethod.HEAD;
+import static com.gui.http.util.HttpStatus.*;
+import static com.gui.http.util.HttpUtil.*;
 
 
 public class StaticHandler implements HttpHandler {
@@ -45,6 +55,9 @@ public class StaticHandler implements HttpHandler {
         if (ifNoneMatch(request, etag))
             return new Response(NOT_MODIFIED);
 
+        if (ifNotModified(request, file))
+            return new Response(NOT_MODIFIED);
+
         byte[] body;
         if (file.isDirectory()) {
             FileExplorerHtml html = new FileExplorerHtml(file, rootPath);
@@ -60,11 +73,13 @@ public class StaticHandler implements HttpHandler {
             return new Response(OK, body, headers);
     }
 
+
     private Map<String, String> getHeaders(File file, String etag, byte[] body) throws IOException {
         return Map.of(
                 CONTENT_TYPE, getContentType(file),
                 CONTENT_LENGTH, "" + body.length,
-                ETAG, etag
+                ETAG, etag,
+                LAST_MODIFIED, getLastModified(file)
         );
     }
 
@@ -84,11 +99,31 @@ public class StaticHandler implements HttpHandler {
         return !(etags.contains("*") || etags.contains(etag));
     }
 
+    private boolean ifNotModified(Request request, File file) throws IOException {
+        if (!request.getHeaders().containsKey(IF_MODIFIED_SINCE))
+            return false;
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT);
+        String cachedFileDate = request.getHeaders().get(IF_MODIFIED_SINCE);
+        ZonedDateTime cachedModified = ZonedDateTime.parse(cachedFileDate, dateFormatter);
+        ZonedDateTime lastModified = ZonedDateTime.parse(getLastModified(file), dateFormatter);
+
+        return !lastModified.isAfter(cachedModified);
+    }
+
     private String getContentType(File file) throws IOException {
         String type = Files.probeContentType(Paths.get(file.getAbsolutePath()));
         if (type == null)
             return "text/html";
         return type;
+    }
+
+    private String getLastModified(File file) throws IOException {
+        BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+        FileTime lastModified = attr.lastModifiedTime();
+        DateFormat format = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return format.format(new Date((lastModified.toMillis())));
     }
 
     private String getEtag(File file) throws IOException {

@@ -59,9 +59,11 @@ public class Request {
     }
 
     private void setHeaders(String header) throws RequestParseException {
-        String[] members = header.split(":");
-        if (members.length < 2)
+        int idx = header.indexOf(":");
+        if (idx == -1 || idx + 1 > header.length())
             throw new RequestParseException("request headers malformed");
-        headers.put(members[0].trim(), members[1].trim());
+        String key = header.substring(0, idx);
+        String value = header.substring(idx + 1);
+        headers.put(key.trim(), value.trim());
     }
 }

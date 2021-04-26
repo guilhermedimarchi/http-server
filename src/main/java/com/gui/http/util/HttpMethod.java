@@ -1,4 +1,4 @@
-package com.gui.http.models;
+package com.gui.http.util;
 
 public class HttpMethod {
     public static final String GET = "GET";

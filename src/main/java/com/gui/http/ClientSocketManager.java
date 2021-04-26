@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.net.Socket;
 
-import static com.gui.http.models.HttpStatus.BAD_REQUEST;
-import static com.gui.http.models.HttpStatus.INTERNAL_SERVER_ERROR;
+import static com.gui.http.util.HttpStatus.BAD_REQUEST;
+import static com.gui.http.util.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class ClientSocketManager implements Runnable {
 

@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.gui.http.models.HttpStatus.NOT_FOUND;
-import static com.gui.http.models.HttpStatus.OK;
+import static com.gui.http.util.HttpStatus.NOT_FOUND;
+import static com.gui.http.util.HttpStatus.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ResponseTest {

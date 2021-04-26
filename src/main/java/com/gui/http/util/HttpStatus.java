@@ -1,4 +1,4 @@
-package com.gui.http.models;
+package com.gui.http.util;
 
 public enum HttpStatus {
     NOT_FOUND(404, "Not Found"),
