@@ -72,7 +72,8 @@ public class StaticHandler implements HttpHandler {
         if (!request.getHeaders().containsKey(IF_NONE_MATCH))
             return false;
 
-        return request.getHeaders().get(IF_NONE_MATCH).contains(etag);
+        String etags = request.getHeaders().get(IF_NONE_MATCH);
+        return (etags.contains("*") || etags.contains(etag));
     }
 
     private boolean checkIfMatch(Request request, String etag) {
@@ -80,10 +81,7 @@ public class StaticHandler implements HttpHandler {
             return false;
 
         String etags = request.getHeaders().get(IF_MATCH);
-        if (etags.contains("*"))
-            return false;
-
-        return !etags.contains(etag);
+        return !(etags.contains("*") || etags.contains(etag));
     }
 
     private String getContentType(File file) throws IOException {

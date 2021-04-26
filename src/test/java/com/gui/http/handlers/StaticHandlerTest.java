@@ -147,6 +147,12 @@ public class StaticHandlerTest {
         }
 
         @Test
+        public void whenNoneMatchesIsStar_shouldRespondNotModified() throws Exception {
+            Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":*"));
+            assertEquals(new Response(NOT_MODIFIED), actualResponse);
+        }
+
+        @Test
         public void whenIfMatchIsDifferentThenEtag_shouldRespondPreconditionFailed() throws Exception {
             handler.handle(request("GET /index.html HTTP/1.1")).send(output);
             String etag = "randometag";
