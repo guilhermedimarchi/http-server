@@ -15,8 +15,7 @@ Currently supports:
 
 Future extensions:
 - Persistent connections
-- Configurable cache control max-age 
-- Extract caching behavior from static file handler and use it in server level
+- Configurable cache control max-age
 - Allow more handlers other than just static file handling
 
 ## How to run
