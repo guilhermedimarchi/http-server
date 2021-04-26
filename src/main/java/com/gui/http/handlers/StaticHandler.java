@@ -29,6 +29,7 @@ public class StaticHandler implements HttpHandler {
 
     private final String rootPath;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT);
+    private int cacheControlMaxAge = 0;
 
     public StaticHandler(String rootPath) {
         this.rootPath = rootPath;
@@ -75,7 +76,8 @@ public class StaticHandler implements HttpHandler {
                 CONTENT_TYPE, getContentType(file),
                 CONTENT_LENGTH, "" + body.length,
                 ETAG, etag,
-                LAST_MODIFIED, getLastModified(file)
+                LAST_MODIFIED, getLastModified(file),
+                CACHE_CONTROL, "max-age="+ cacheControlMaxAge
         );
     }
 

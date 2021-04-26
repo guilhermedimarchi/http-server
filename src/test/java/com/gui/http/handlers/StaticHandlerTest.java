@@ -62,7 +62,8 @@ public class StaticHandlerTest {
                     CONTENT_TYPE, "text/html",
                     CONTENT_LENGTH, "" + body.length,
                     ETAG, StringUtil.toHex(f.getName() + attr.lastModifiedTime().toString() + attr.size()),
-                    LAST_MODIFIED, formatter.format(new Date((lastModified.toMillis())))
+                    LAST_MODIFIED, formatter.format(new Date((lastModified.toMillis()))),
+                    CACHE_CONTROL, "max-age=0"
             );
         }
 
