@@ -39,10 +39,10 @@ public class StaticHandler implements HttpHandler {
             return new Response(NOT_FOUND);
 
         String etag = getEtag(file);
-        if (checkIfMatch(request, etag))
+        if (ifMatch(request, etag))
             return new Response(PRECONDITION_FAILED);
 
-        if (checkIfNoneMatch(request, etag))
+        if (ifNoneMatch(request, etag))
             return new Response(NOT_MODIFIED);
 
         byte[] body;
@@ -68,7 +68,7 @@ public class StaticHandler implements HttpHandler {
         );
     }
 
-    private boolean checkIfNoneMatch(Request request, String etag) {
+    private boolean ifNoneMatch(Request request, String etag) {
         if (!request.getHeaders().containsKey(IF_NONE_MATCH))
             return false;
 
@@ -76,7 +76,7 @@ public class StaticHandler implements HttpHandler {
         return (etags.contains("*") || etags.contains(etag));
     }
 
-    private boolean checkIfMatch(Request request, String etag) {
+    private boolean ifMatch(Request request, String etag) {
         if (!request.getHeaders().containsKey(IF_MATCH))
             return false;
 

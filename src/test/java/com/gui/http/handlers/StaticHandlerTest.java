@@ -139,7 +139,7 @@ public class StaticHandlerTest {
         }
 
         @Test
-        public void whenNoneMatchesIsEqualEtag_shouldRespondNotModified() throws Exception {
+        public void whenIfNoneMatchIsEqualEtag_shouldRespondNotModified() throws Exception {
             handler.handle(request("GET /index.html HTTP/1.1")).send(output);
             String etags = "etag1,etag2," + getEtag(output.toString());
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":" + etags));
@@ -147,7 +147,7 @@ public class StaticHandlerTest {
         }
 
         @Test
-        public void whenNoneMatchesIsStar_shouldRespondNotModified() throws Exception {
+        public void whenIfNoneMatchIsStar_shouldRespondNotModified() throws Exception {
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_NONE_MATCH + ":*"));
             assertEquals(new Response(NOT_MODIFIED), actualResponse);
         }
@@ -167,6 +167,7 @@ public class StaticHandlerTest {
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ":" + etags));
             assertNotEquals(new Response(PRECONDITION_FAILED), actualResponse);
         }
+
         @Test
         public void whenIfMatchIsStar_shouldProceedWithRequest() throws Exception {
             Response actualResponse = handler.handle(request("GET /index.html HTTP/1.1\n" + IF_MATCH + ": *"));
