@@ -69,17 +69,20 @@ public class StaticHandler implements HttpHandler {
     }
 
     private boolean checkIfNoneMatch(Request request, String etag) {
-        return etag.equals(request.getHeaders().get(IF_NONE_MATCH));
+        if (!request.getHeaders().containsKey(IF_NONE_MATCH))
+            return false;
+
+        return request.getHeaders().get(IF_NONE_MATCH).contains(etag);
     }
 
     private boolean checkIfMatch(Request request, String etag) {
-        if (!request.getHeaders().containsKey(IF_MATCH)) {
+        if (!request.getHeaders().containsKey(IF_MATCH))
             return false;
-        }
+
         String etags = request.getHeaders().get(IF_MATCH);
-        if (etags.contains("*")) {
+        if (etags.contains("*"))
             return false;
-        }
+
         return !etags.contains(etag);
     }
 
