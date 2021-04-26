@@ -2,6 +2,7 @@ package com.gui.http.handlers;
 
 import com.gui.http.models.Request;
 import com.gui.http.models.Response;
+import com.gui.http.util.HttpUtil;
 import com.gui.http.util.StringUtil;
 import org.junit.jupiter.api.*;
 
@@ -24,6 +25,7 @@ import java.util.TimeZone;
 
 import static com.gui.http.util.HttpHeader.*;
 import static com.gui.http.util.HttpStatus.*;
+import static com.gui.http.util.HttpUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -48,7 +50,7 @@ public class StaticHandlerTest {
 
         private byte[] body;
         private Map<String, String> headers;
-        private DateFormat formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss \'GMT\'", Locale.US);
+        private final DateFormat formatter = new SimpleDateFormat(HTTP_DATE_FORMAT, Locale.US);
 
         @BeforeAll
         public void beforeAll() throws Exception {
@@ -195,7 +197,7 @@ public class StaticHandlerTest {
 
         @Test
         public void whenResourceIsNewerThenClientCache_shouldProceedWithRequest() throws Exception {
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT);
 
             handler.handle(request("GET /index.html HTTP/1.1")).send(output);
             ZonedDateTime date = ZonedDateTime.parse(headerValueOf(LAST_MODIFIED, output.toString()), dateFormatter).minusDays(1);
