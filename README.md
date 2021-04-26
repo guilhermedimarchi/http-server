@@ -1,9 +1,23 @@
 
 # http-server
 
-Simple implementation of a HTTP webserver using Java. The server can serve static files and directories.  By default, it serves content from folder www located in root of project.
+Simple implementation of a HTTP webserver using Java and following Test Driven Development (TDD). Evolution of the codebase can be seen through commit history.
 
-Currently supports only GET and HEAD requests.
+The server can serve files, allow navigating in directories and subdirectories inside root path.
+
+If root path is not specified, by default, it will serve static content from folder www located in root of project.
+
+Currently supports:
+- GET request
+- HEAD request
+- Supports handling ETag, If-Match, If-None-Match, If-Modified-Since headers
+- Cache-Control max-age has default of 0 so that browser does not cache in disk and requests are sent to server to validate headers above
+
+Future extensions:
+- Persistent connections
+- Configurable cache control max-age 
+- Extract caching behavior from static file handler and use it in server level
+- Allow handlers other than just static file handling
 
 ## How to run
 
