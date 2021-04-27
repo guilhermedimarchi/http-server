@@ -16,10 +16,10 @@ import static org.mockito.Mockito.*;
 public class HttpServerTest {
 
     @Test
-    public void shouldListenToPortAndAcceptConnections() throws IOException {
+    public void shouldListenToPortAndAcceptConnections() throws IOException, InterruptedException {
         HttpHandler mockHandler = mock(HttpHandler.class);
         when(mockHandler.handle(any())).thenReturn(new Response(OK));
-        int port = 49152;
+        int port = 8081;
         Thread thread = new Thread(() -> {
             try {
                 HttpServer server = new HttpServer(port);
@@ -32,10 +32,11 @@ public class HttpServerTest {
         thread.start();
 
         assertClientCanConnectToPort(port);
-        verify(mockHandler, timeout(5000).times(1)).handle(any());
+        verify(mockHandler, timeout(5000).atLeast(1)).handle(any());
     }
 
-    private void assertClientCanConnectToPort(int port) {
+    private void assertClientCanConnectToPort(int port) throws InterruptedException {
+        Thread.sleep(2000);
         try (Socket someClient = new Socket("localhost", port)) {
             assertTrue(someClient.isConnected());
             DataOutputStream out = new DataOutputStream(someClient.getOutputStream());
@@ -43,6 +44,7 @@ public class HttpServerTest {
             out.flush();
             out.close();
         } catch (Exception e) {
+            e.printStackTrace();
             fail("client socket should be able to connect");
         }
     }

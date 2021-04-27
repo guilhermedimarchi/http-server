@@ -49,13 +49,17 @@ public class Response {
     }
 
     private void writeHeaders(PrintWriter printer) {
-        addHeader(DATE, new Date() + "");
-        addHeader(CONTENT_LENGTH, body != null ? body.length + "" : "0");
+        addCommonHeaders();
         for (String header : headers.keySet()) {
             printer.println(header + ": " + headers.get(header));
         }
         printer.println();
         printer.flush();
+    }
+
+    private void addCommonHeaders() {
+        addHeader(DATE, new Date() + "");
+        addHeader(CONTENT_LENGTH, body != null ? body.length + "" : "0");
     }
 
     @Override
