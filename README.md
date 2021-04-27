@@ -61,7 +61,11 @@ Then run artifact:
 
 ### With docker
 
-Build docker image locally:
+Docker run will pull image from Dockerhub:
+
+    docker run -p 8080:8080 guilhermedimarchi/http-server
+
+Or Build docker image locally:
 
     docker build -t http-server .
 
