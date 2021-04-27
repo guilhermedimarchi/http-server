@@ -19,6 +19,7 @@ Future extensions:
 - Allow configuring some parameters via env variables or main args.
 - Timeout and close persistent sockets that were not used in last X milliseconds.
 - Enable/disable directory exploring
+- Non-blocking I/O
 
 ## Implementation approach and design considerations
 The project was developed following Test Driven Development (bottom-up approach). Evolution of the codebase can be seen through commit history.

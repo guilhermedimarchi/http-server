@@ -17,15 +17,15 @@ import static com.gui.http.util.HttpUtil.HTTP_DATE_FORMAT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class CachedHandlerTest {
+public class CachedFileHandlerTest {
 
     private static final String rootPath = new File("./src/test/resources/www").getAbsolutePath();
     private ByteArrayOutputStream output;
-    private CachedHandler handler;
+    private CachedFileHandler handler;
 
     @BeforeEach
     public void setup() {
-        handler = new CachedHandler(new StaticHandler(rootPath));
+        handler = new CachedFileHandler(new FileHandler(rootPath));
         output = new ByteArrayOutputStream();
     }
 

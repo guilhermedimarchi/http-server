@@ -21,13 +21,13 @@ import static com.gui.http.util.HttpHeader.*;
 import static com.gui.http.util.HttpStatus.*;
 import static com.gui.http.util.HttpUtil.HTTP_DATE_FORMAT;
 
-public class CachedHandler implements HttpHandler {
+public class CachedFileHandler implements HttpHandler {
 
-    private final StaticHandler handler;
+    private final FileHandler handler;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(HTTP_DATE_FORMAT);
     private int cacheControlMaxAge = 0;
 
-    public CachedHandler(StaticHandler handler) {
+    public CachedFileHandler(FileHandler handler) {
         this.handler = handler;
     }
 

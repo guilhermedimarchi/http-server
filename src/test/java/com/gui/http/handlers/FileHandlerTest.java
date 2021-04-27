@@ -17,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.TestInstance.Lifecycle;
 
 
-public class StaticHandlerTest {
+public class FileHandlerTest {
 
     private static final String rootPath = new File("./src/test/resources/www").getAbsolutePath();
-    private StaticHandler handler;
+    private FileHandler handler;
 
     @BeforeEach
     public void setup() {
-        handler = new StaticHandler(rootPath);
+        handler = new FileHandler(rootPath);
     }
 
     private Request request(String content) throws Exception {

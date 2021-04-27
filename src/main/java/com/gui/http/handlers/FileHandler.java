@@ -20,11 +20,11 @@ import static com.gui.http.util.HttpMethod.HEAD;
 import static com.gui.http.util.HttpStatus.*;
 
 
-public class StaticHandler implements HttpHandler {
+public class FileHandler implements HttpHandler {
 
     private final String rootPath;
 
-    public StaticHandler(String rootPath) {
+    public FileHandler(String rootPath) {
         this.rootPath = rootPath;
     }
 

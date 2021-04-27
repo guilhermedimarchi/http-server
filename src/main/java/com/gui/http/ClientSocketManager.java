@@ -53,6 +53,7 @@ public class ClientSocketManager implements Runnable {
                         response.addHeader(CONNECTION, "keep-alive");
                         response.addHeader(KEEP_ALIVE, "max=" + maxRequestsPerConnection);
                     }
+
                 } catch (RequestParseException e) {
                     LOGGER.error("bad request", e);
                     connected = false;
