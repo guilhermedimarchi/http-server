@@ -9,4 +9,6 @@ public class HttpHeader {
     public static final String LAST_MODIFIED = "Last-Modified";
     public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
     public static final String CACHE_CONTROL = "Cache-Control";
+    public static final String DATE = "Date";
+    public static final String CONNECTION = "Connection";
 }

@@ -4,15 +4,17 @@ import com.gui.http.util.HttpStatus;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import static com.gui.http.util.HttpHeader.CONTENT_LENGTH;
+import static com.gui.http.util.HttpHeader.DATE;
 
 public class Response {
 
     private final HttpStatus status;
-    private byte[] body;
+    private byte[] body = new byte[0];
     private Map<String, String> headers = new HashMap<>();
 
     public Response(HttpStatus status) {
@@ -30,32 +32,30 @@ public class Response {
     }
 
     public void send(OutputStream output) throws IOException {
-        writeStatusLine(output);
-        writeHeaders(output);
+        PrintWriter printWriter = new PrintWriter(output, true, StandardCharsets.US_ASCII);
+        writeStatusLine(printWriter);
+        writeHeaders(printWriter);
         writeBody(output);
-        output.flush();
-        output.close();
     }
 
-    private void writeStatusLine(OutputStream output) throws IOException {
-        output.write(("HTTP/1.1 " + status.value() + " " + status.description() + "\r\n").getBytes());
+    private void writeBody(OutputStream bos) throws IOException {
+        if (body != null)
+            bos.write(body, 0, body.length);
+        bos.flush();
     }
 
-    private void writeBody(OutputStream output) throws IOException {
-        if (body != null) {
-            output.write("\r\n".getBytes());
-            output.write(this.body);
+    private void writeStatusLine(PrintWriter printer) {
+        printer.println("HTTP/1.1 " + status.value() + " " + status.description());
+    }
+
+    private void writeHeaders(PrintWriter printer) {
+        addHeader(DATE, new Date() + "");
+        addHeader(CONTENT_LENGTH, body != null ? body.length + "" : "0");
+        for (String header : headers.keySet()) {
+            printer.println(header + ": " + headers.get(header));
         }
-    }
-
-    private void writeHeaders(OutputStream output) throws IOException {
-        if (headers != null) {
-            for (String header : headers.keySet()) {
-                String line = header + ": " + headers.get(header);
-                output.write(line.getBytes());
-                output.write("\r\n".getBytes());
-            }
-        }
+        printer.println();
+        printer.flush();
     }
 
     @Override
@@ -77,5 +77,8 @@ public class Response {
         this.headers.putAll(headers);
     }
 
+    public void addHeader(String key, String value) {
+        this.headers.put(key, value);
+    }
 
 }
