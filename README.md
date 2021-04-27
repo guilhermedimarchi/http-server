@@ -34,10 +34,10 @@ TDD allows for great confidence for code refactoring while making sure functiona
 - ClientSocketManager is responsible for high level management of the request/response lifecycle, making sure request format is valid and handling possible exceptions that the handler itself did not catch. It also takes care of the persistent connection behavior by controlling some headers (connection and keep alive). Possible opportunity to remove the logic from persistent behavior from this class.  
 
 
-- CacheHandler is a wrapper (proxy pattern) of the StaticHandler . Basically it intercepts and control access to the more expensive object (StaticHandler). This is done via headers ETag, If-Match, If-None-Match, If-Modified-Since headers.
+- CachedFileHandler is a wrapper (proxy pattern) of the FileHandler . Basically it intercepts and control access to the more expensive object (StaticHandler). This is done via headers ETag, If-Match, If-None-Match, If-Modified-Since headers.
 
 
-- StaticHandler is responsible for reading the files or directories from disk.
+- FileHandler is responsible for reading the files or directories from disk.
 
 ## How to run
 
