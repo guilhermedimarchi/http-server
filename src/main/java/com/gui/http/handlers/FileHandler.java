@@ -7,7 +7,6 @@ import com.gui.http.models.Response;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import static com.gui.http.util.HttpHeader.CONTENT_TYPE;
 import static com.gui.http.util.HttpMethod.GET;
 import static com.gui.http.util.HttpMethod.HEAD;
 import static com.gui.http.util.HttpStatus.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 public class FileHandler implements HttpHandler {
@@ -32,7 +32,7 @@ public class FileHandler implements HttpHandler {
         if (methodNotImplemented(request))
             return new Response(NOT_IMPLEMENTED);
 
-        String decodedPath = URLDecoder.decode(rootPath + request.getPath(), StandardCharsets.UTF_8);
+        String decodedPath = URLDecoder.decode(rootPath + request.getPath(), UTF_8);
         File file = new File(decodedPath);
         if (!file.exists())
             return new Response(NOT_FOUND);

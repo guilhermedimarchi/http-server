@@ -61,7 +61,7 @@ public class ClientSocketManager implements Runnable {
                 Request request = new Request(in);
                 LOGGER.debug("request received from: " + socket);
                 response = handler.handle(request);
-                connected = processPersistentConnection(response, request);
+                connected = processPersistentConnection(request, response);
             } catch (RequestParseException e) {
                 LOGGER.error("bad request", e);
                 connected = false;
@@ -75,7 +75,7 @@ public class ClientSocketManager implements Runnable {
         }
     }
 
-    private boolean processPersistentConnection(Response response, Request request) {
+    private boolean processPersistentConnection(Request request, Response response) {
         boolean connected = true;
         if (clientWantsToCloseConnection(request) || requestCount >= maxRequestsPerConnection) {
             connected = false;

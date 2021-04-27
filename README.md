@@ -14,12 +14,13 @@ Currently supports:
 - Cache-Control (max-age has default of 0 so browser does not cache in disk and requests are sent to server to validate headers above).
 - HTTP 1.1 Persistent connections (connection and keep alive headers, except timeout configuration. Default max requests per connection is set to 3).
 
-Future extensions:
+Possible future extensions:
 - Allow more handlers other than just static file handling.
 - Allow configuring some parameters via env variables or main args.
 - Timeout and close persistent sockets that were not used in last X milliseconds.
 - Enable/disable directory exploring
 - Non-blocking I/O
+- JavaDoc
 
 ## Implementation approach and design considerations
 The project was developed following Test Driven Development (bottom-up approach). Evolution of the codebase can be seen through commit history.

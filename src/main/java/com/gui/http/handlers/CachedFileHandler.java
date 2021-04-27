@@ -7,7 +7,6 @@ import com.gui.http.util.StringUtil;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -20,6 +19,7 @@ import java.util.Map;
 import static com.gui.http.util.HttpHeader.*;
 import static com.gui.http.util.HttpStatus.*;
 import static com.gui.http.util.HttpUtil.HTTP_DATE_FORMAT;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class CachedFileHandler implements HttpHandler {
 
@@ -33,7 +33,7 @@ public class CachedFileHandler implements HttpHandler {
 
     @Override
     public Response handle(Request request) throws IOException {
-        String decodedPath = URLDecoder.decode(handler.getRootPath() + request.getPath(), StandardCharsets.UTF_8);
+        String decodedPath = URLDecoder.decode(handler.getRootPath() + request.getPath(), UTF_8);
         File file = new File(decodedPath);
         if (!file.exists())
             return new Response(NOT_FOUND);
