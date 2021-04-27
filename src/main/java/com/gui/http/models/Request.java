@@ -1,7 +1,5 @@
 package com.gui.http.models;
 
-import org.apache.log4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -9,7 +7,6 @@ import java.util.Map;
 
 public class Request {
 
-    private static final Logger LOGGER = Logger.getLogger(Request.class);
     private final Map<String, String> headers = new HashMap<>();
     private String method;
     private String path;

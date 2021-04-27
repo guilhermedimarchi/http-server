@@ -72,7 +72,7 @@ public class ClientSocketManagerTest {
     }
 
     @Test
-    public void whenRequestIsMalFormed_shouldReturn400() throws Exception {
+    public void whenRequestIsMalFormed_shouldReturnBadRequest() throws Exception {
         givenInput("invalidRequest");
 
         manager.run();
@@ -84,7 +84,7 @@ public class ClientSocketManagerTest {
     }
 
     @Test
-    public void whenHandlerThrowsException_shouldReturn500() throws Exception {
+    public void whenHandlerThrowsException_shouldReturnInternalServerError() throws Exception {
         givenInput("HEAD / HTTP/1.1");
         when(handler.handle(any())).thenAnswer(invocation -> {
             throw new IOException("some error while reading content");
