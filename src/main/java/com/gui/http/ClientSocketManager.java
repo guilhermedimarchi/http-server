@@ -13,7 +13,7 @@ import static com.gui.http.util.HttpHeader.CONNECTION;
 import static com.gui.http.util.HttpHeader.KEEP_ALIVE;
 import static com.gui.http.util.HttpStatus.BAD_REQUEST;
 import static com.gui.http.util.HttpStatus.INTERNAL_SERVER_ERROR;
-import static java.nio.charset.StandardCharsets.*;
+import static java.nio.charset.StandardCharsets.US_ASCII;
 
 public class ClientSocketManager implements Runnable {
 
@@ -58,8 +58,8 @@ public class ClientSocketManager implements Runnable {
             requestCount++;
             Response response;
             try {
-                LOGGER.debug("request received from: " + socket);
                 Request request = new Request(in);
+                LOGGER.debug("request received from: " + socket);
                 response = handler.handle(request);
                 connected = processPersistentConnection(response, request);
             } catch (RequestParseException e) {

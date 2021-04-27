@@ -1,8 +1,8 @@
 package com.gui.http;
 
 import com.gui.http.handlers.CachedFileHandler;
-import com.gui.http.handlers.HttpHandler;
 import com.gui.http.handlers.FileHandler;
+import com.gui.http.handlers.HttpHandler;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -12,8 +12,8 @@ import java.net.Socket;
 public class HttpServer {
 
     private static final Logger LOGGER = Logger.getLogger(HttpServer.class);
-    private HttpHandler handler = new CachedFileHandler(new FileHandler("www"));
     private final int port;
+    private HttpHandler handler = new CachedFileHandler(new FileHandler("www"));
 
     public HttpServer(int port) throws IOException {
         this.port = port;
