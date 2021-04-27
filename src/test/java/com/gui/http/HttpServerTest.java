@@ -19,10 +19,10 @@ public class HttpServerTest {
     public void shouldListenToPortAndAcceptConnections() throws IOException {
         HttpHandler mockHandler = mock(HttpHandler.class);
         when(mockHandler.handle(any())).thenReturn(new Response(OK));
-
+        int port = 49152;
         Thread thread = new Thread(() -> {
             try {
-                HttpServer server = new HttpServer(8081);
+                HttpServer server = new HttpServer(port);
                 server.setDefaultHandler(mockHandler);
                 server.start();
             } catch (IOException e) {
@@ -31,8 +31,8 @@ public class HttpServerTest {
         });
         thread.start();
 
-        assertClientCanConnectToPort(8081);
-        verify(mockHandler, timeout(3000).times(1)).handle(any());
+        assertClientCanConnectToPort(port);
+        verify(mockHandler, timeout(5000).times(1)).handle(any());
     }
 
     private void assertClientCanConnectToPort(int port) {
