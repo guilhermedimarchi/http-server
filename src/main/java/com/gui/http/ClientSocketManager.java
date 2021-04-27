@@ -42,8 +42,7 @@ public class ClientSocketManager implements Runnable {
                 requestCount++;
                 Response response;
                 try {
-                    LOGGER.debug("Request received from: " + socket);
-
+                    LOGGER.debug("request received from: " + socket);
                     Request request = new Request(input);
                     response = handler.handle(request);
 
@@ -70,7 +69,7 @@ public class ClientSocketManager implements Runnable {
         } finally {
             try {
                 socket.close();
-                LOGGER.info("Closing connection: " + socket);
+                LOGGER.info("closing connection: " + socket);
             } catch (IOException e) {
                 LOGGER.error("could not close socket", e);
             }
