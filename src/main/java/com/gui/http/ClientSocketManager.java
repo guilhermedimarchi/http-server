@@ -43,12 +43,11 @@ public class ClientSocketManager implements Runnable {
                 Response response;
                 try {
                     LOGGER.debug("Request received from: " + socket);
-                    Request request = new Request(input);
-                    if(request.getHeaders().containsKey(CONNECTION) && "close".equals(request.getHeaders().get(CONNECTION)))
-                        connected = false;
 
+                    Request request = new Request(input);
                     response = handler.handle(request);
-                    if (requestCount >= maxRequestsPerConnection || !connected) {
+
+                    if (clientWantsToCloseConnection(request) || requestCount >= maxRequestsPerConnection) {
                         connected = false;
                         response.addHeader(CONNECTION, "close");
                     } else {
@@ -76,5 +75,9 @@ public class ClientSocketManager implements Runnable {
                 LOGGER.error("could not close socket", e);
             }
         }
+    }
+
+    private boolean clientWantsToCloseConnection(Request request) {
+        return request.getHeaders().containsKey(CONNECTION) && "close".equals(request.getHeaders().get(CONNECTION));
     }
 }
