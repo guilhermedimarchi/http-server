@@ -24,7 +24,9 @@ Possible future extensions:
 
 ## Implementation approach and design considerations
 The project was developed following Test Driven Development (bottom-up approach). Evolution of the codebase can be seen through commit history.
-TDD allows for great confidence for code refactoring while making sure functionality is not affected. It strongly helps to reduce maintenance costs and increase speed to develop new functionalites, since its possible to quickly get feedback from the code that everything works as expected.
+TDD allows for great confidence for code refactoring while making sure functionality is not affected. It strongly helps to reduce maintenance costs and increase speed to develop new functionalities, since its possible to quickly get feedback from the code that everything works as expected.
+Additionally, it provides a very good documentation of the code. 
+
 
 - App.java is where main method is located.
 
