@@ -2,7 +2,10 @@ package com.gui.http.models;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,7 +55,9 @@ public class RequestTest {
     }
 
     private Request createRequest(String content) throws Exception {
-        return new Request(new ByteArrayInputStream(content.getBytes()));
+        ByteArrayInputStream bis = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        BufferedReader in = new BufferedReader(new InputStreamReader(bis, StandardCharsets.US_ASCII));
+        return new Request(in);
     }
 
 }

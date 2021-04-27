@@ -4,8 +4,6 @@ import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,14 +14,10 @@ public class Request {
     private String method;
     private String path;
 
-    public Request(InputStream input) throws RequestParseException, IOException {
+    public Request(BufferedReader in) throws RequestParseException, IOException {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(input));
-
             String requestLine = in.readLine();
-            LOGGER.debug("Request received: " + requestLine);
             setRequestLine(requestLine);
-
             String header = in.readLine();
             while (header != null && !header.isBlank()) {
                 setHeaders(header);

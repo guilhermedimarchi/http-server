@@ -6,9 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +30,9 @@ public class CachedHandlerTest {
     }
 
     private Request request(String content) throws Exception {
-        return new Request(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)));
+        ByteArrayInputStream bis = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+        BufferedReader in = new BufferedReader(new InputStreamReader(bis, StandardCharsets.US_ASCII));
+        return new Request(in);
     }
 
     private String headerValueOf(String header, String response) {

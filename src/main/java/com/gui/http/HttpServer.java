@@ -1,5 +1,6 @@
 package com.gui.http;
 
+import com.gui.http.handlers.CachedHandler;
 import com.gui.http.handlers.HttpHandler;
 import com.gui.http.handlers.StaticHandler;
 import org.apache.log4j.Logger;
@@ -11,8 +12,8 @@ import java.net.Socket;
 public class HttpServer {
 
     private static final Logger LOGGER = Logger.getLogger(HttpServer.class);
+    private HttpHandler handler = new CachedHandler(new StaticHandler("www"));
     private final int port;
-    private HttpHandler handler = new StaticHandler("www");
 
     public HttpServer(int port) throws IOException {
         this.port = port;
@@ -24,11 +25,11 @@ public class HttpServer {
 
     public void start() throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            LOGGER.info("Started server");
-            LOGGER.info("Listening to port: " + port);
+            LOGGER.info("started server");
+            LOGGER.info("listening to port: " + port);
             Socket clientSocket;
             while ((clientSocket = serverSocket.accept()) != null) {
-                LOGGER.info("New connection: " + clientSocket.toString());
+                LOGGER.info("new connection: " + clientSocket.toString());
                 ClientSocketManager manager = new ClientSocketManager(clientSocket, handler);
                 Thread t = new Thread(manager);
                 t.start();

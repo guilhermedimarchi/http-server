@@ -92,4 +92,8 @@ public class CachedHandler implements HttpHandler {
         ZonedDateTime lastModified = ZonedDateTime.parse(getLastModified(file), dateFormatter);
         return !lastModified.isAfter(cachedModified);
     }
+
+    public void setCacheControlMaxAge(int cacheControlMaxAge) {
+        this.cacheControlMaxAge = cacheControlMaxAge;
+    }
 }
