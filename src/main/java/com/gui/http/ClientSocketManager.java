@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 import static com.gui.http.util.HttpHeader.CONNECTION;
+import static com.gui.http.util.HttpHeader.KEEP_ALIVE;
 import static com.gui.http.util.HttpStatus.BAD_REQUEST;
 import static com.gui.http.util.HttpStatus.INTERNAL_SERVER_ERROR;
 import static java.nio.charset.StandardCharsets.*;
@@ -49,11 +49,11 @@ public class ClientSocketManager implements Runnable {
 
                     response = handler.handle(request);
                     if (requestCount >= maxRequestsPerConnection || !connected) {
-                        response.addHeader(CONNECTION, "close");
                         connected = false;
+                        response.addHeader(CONNECTION, "close");
                     } else {
                         response.addHeader(CONNECTION, "keep-alive");
-                        response.addHeader("Keep-Alive", "max=" + maxRequestsPerConnection);
+                        response.addHeader(KEEP_ALIVE, "max=" + maxRequestsPerConnection);
                     }
                 } catch (RequestParseException e) {
                     LOGGER.error("bad request", e);
