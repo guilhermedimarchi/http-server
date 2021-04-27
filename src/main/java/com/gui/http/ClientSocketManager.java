@@ -21,6 +21,7 @@ public class ClientSocketManager implements Runnable {
     private final Socket socket;
     private final HttpHandler handler;
     private int maxRequestsPerConnection = 3;
+    private int requestCount = 0;
 
     public ClientSocketManager(Socket socket, HttpHandler handler) {
         this.socket = socket;
@@ -36,8 +37,8 @@ public class ClientSocketManager implements Runnable {
         try (BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
              BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
              BufferedReader input = new BufferedReader(new InputStreamReader(in, US_ASCII))) {
+
             boolean connected = true;
-            int requestCount = 0;
             while (connected) {
                 requestCount++;
                 Response response;
@@ -45,15 +46,7 @@ public class ClientSocketManager implements Runnable {
                     LOGGER.debug("request received from: " + socket);
                     Request request = new Request(input);
                     response = handler.handle(request);
-
-                    if (clientWantsToCloseConnection(request) || requestCount >= maxRequestsPerConnection) {
-                        connected = false;
-                        response.addHeader(CONNECTION, "close");
-                    } else {
-                        response.addHeader(CONNECTION, "keep-alive");
-                        response.addHeader(KEEP_ALIVE, "max=" + maxRequestsPerConnection);
-                    }
-
+                    connected = processPersistentConnection(response, request);
                 } catch (RequestParseException e) {
                     LOGGER.error("bad request", e);
                     connected = false;
@@ -75,6 +68,18 @@ public class ClientSocketManager implements Runnable {
                 LOGGER.error("could not close socket", e);
             }
         }
+    }
+
+    private boolean processPersistentConnection(Response response, Request request) {
+        boolean connected = true;
+        if (clientWantsToCloseConnection(request) || requestCount >= maxRequestsPerConnection) {
+            connected = false;
+            response.addHeader(CONNECTION, "close");
+        } else {
+            response.addHeader(CONNECTION, "keep-alive");
+            response.addHeader(KEEP_ALIVE, "max=" + maxRequestsPerConnection);
+        }
+        return connected;
     }
 
     private boolean clientWantsToCloseConnection(Request request) {
